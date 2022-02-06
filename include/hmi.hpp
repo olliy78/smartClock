@@ -5,6 +5,7 @@
 
 
 #include "main.hpp"
+#include "slider.hpp"
 
 //HMI specific definitions
 #define SLIDERH 40
@@ -28,6 +29,7 @@ class SmartClockHmi{
     Gesture *swipeLeft, *swipeRight;
     int slide1pos;
 
+    SmartSlider *slider1, *slider2, *slider3;
 
     // private functions
     void checkButtons();
@@ -43,5 +45,6 @@ public:
     void update();
     void wipeScreen(int dir);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
+    void handlePressEvent(int x, int y);
     
 };

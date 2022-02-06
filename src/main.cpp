@@ -14,6 +14,10 @@ void buttonDragged(Event& e) {
   hmi->handleDragEvent(e.from.x, e.from.y, e.to.x, e.to.y);
 }
 
+void buttonPressed(Event& e) {
+  hmi->handlePressEvent(e.to.x, e.to.y);
+}
+
 void setup() {
   // put your setup code here, to run once:
   M5.begin();
@@ -24,7 +28,7 @@ void setup() {
   //M5.Buttons.addHandler(wipeScr, E_GESTURE);
   //M5.Buttons.addHandler(toggleColor, E_DBLTAP);
   M5.Buttons.addHandler(buttonDragged, E_DRAGGED);
-  //M5.Buttons.addHandler(buttonPressed, E_TOUCH + E_RELEASE);
+  M5.Buttons.addHandler(buttonPressed, E_TOUCH + E_RELEASE);
   //swipeDown.addHandler(wipeScr, E_GESTURE);
 
   

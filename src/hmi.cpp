@@ -13,7 +13,7 @@
 //constructor
 SmartClockHmi::SmartClockHmi(){
     AlarmState = false;
-    screen = -1;
+    screen = -2;
     slide1pos = 0;
     hh = 0, mm = 0, ss = 0; 
     targetTime = 0;                    // for next 1 second timeout
@@ -36,11 +36,19 @@ void SmartClockHmi::init(){
     tr  = new Button(110, 0, 100, 100, false, "top-right", off_clrs, on_clrs, CC_DATUM);
     br  = new Button(110, 110, 100, 100, false, "bottom-right", off_clrs, on_clrs, CC_DATUM);
 
-    slide1  = new Button(SLIDER1X, slide1pos + SLIDER1Y, SLIDERW, SLIDERH, false, "", on_clrs, on_clrs, CC_DATUM);
+    slide1  = new Button(SLIDER1X, (SLIDER1H - slide1pos) + SLIDER1Y - SLIDERH, SLIDERW, SLIDERH, false, "", on_clrs, on_clrs, CC_DATUM);
 
+    slider1 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 10, 300);
+    slider2 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 80, 300);
+    slider3 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 150, 300);
 
     swipeLeft = new Gesture("swipe left", 75, DIR_LEFT, 30, false, 500U);
     swipeRight = new Gesture("swipe right", 75, DIR_RIGHT, 30, false, 500U);
+
+    slider1->setValue(20);
+    slider2->setValue(40);
+    slider3->setValue(60);
+    
 
     drawScreen();
 }
@@ -59,6 +67,10 @@ void SmartClockHmi::update(){
     if (screen == 0){
         showClock(0);
     }
+    //update slider
+    slider1->update();
+    slider2->update();
+    slider3->update();
 }
 
 void SmartClockHmi::wipeScreen(int dir){
@@ -111,26 +123,53 @@ void SmartClockHmi::checkButtons() {
   
 }
 
+void SmartClockHmi::handlePressEvent(int x, int y){
+    slider1->handlePressEvent(x,y);
+    slider2->handlePressEvent(x,y);
+    slider3->handlePressEvent(x,y);
+
+    if (screen == -1){
+        if ((x >= SLIDER1X && x <= SLIDER1X + SLIDERW) && (y >= SLIDER1Y && y <= SLIDER1Y + 30)){
+            Serial.println("Slider1 up");
+
+        }
+        if ((x >= SLIDER1X && x <= SLIDER1X + SLIDERW) && (y >= SLIDER1Y && y <= SLIDER1Y + 30)){
+            Serial.println("Slider1 up");
+
+        }
+
+
+    }
+/*
+    Serial.print(x);
+    Serial.print(" ");
+    Serial.println(y);
+*/
+}
+
 void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){    
 
+    slider1->handleDragEvent(fromX, fromY, toX, toY);
+    slider2->handleDragEvent(fromX, fromY, toX, toY);
+    slider3->handleDragEvent(fromX, fromY, toX, toY);
     
     Point fromPoint(fromX, fromY);
     Point toPoint(toX, toY);
-    Zone slider1zone(SLIDER1X, slide1pos + SLIDER1Y, SLIDERW, SLIDERH);
+    Zone slider1zone(SLIDER1X, (SLIDER1H - slide1pos) + SLIDER1Y - SLIDERH, SLIDERW, SLIDERH);
 
     if (slider1zone.contains(fromPoint)){
         Serial.println("Slider1 detected");
         slide1->hide();
-        M5.Lcd.fillRect(SLIDER1X, slide1pos + SLIDER1Y, SLIDERW, SLIDERH, BLACK);
-        M5.Lcd.drawRect(SLIDER1X +15, SLIDER1Y, 15, SLIDER1H, YELLOW);
-        slide1pos = toY - SLIDER1Y;
-        slide1->y = slide1pos + SLIDER1Y;
+        M5.Lcd.fillRect(SLIDER1X, (SLIDER1H - slide1pos) + SLIDER1Y - SLIDERH, SLIDERW, SLIDERH, BLACK);
+        M5.Lcd.drawRect(SLIDER1X +17, SLIDER1Y, 15, SLIDER1H, YELLOW);
+        slide1pos = SLIDER1Y + SLIDER1H -toY;
+        slide1->y = (SLIDER1Y + SLIDER1H) - slide1pos;
         slide1->draw();
 
         Serial.print("new position: ");
         Serial.println(slide1pos);
     }
-
+/*
     Serial.print(fromX);
     Serial.print(" ");
     Serial.print(fromY);
@@ -138,6 +177,7 @@ void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){
     Serial.print(toX);
     Serial.print(" ");
     Serial.println(toY);
+*/
 }
 
 void SmartClockHmi::drawScreen(){
@@ -148,6 +188,9 @@ void SmartClockHmi::drawScreen(){
     bl->hide();
     tr->hide();
     br->hide();
+    slider1->setVisible(false);
+    slider2->setVisible(false);
+    slider3->setVisible(false);
     //clear screen
     M5.Lcd.fillScreen(TFT_BLACK);
     // show buttons
@@ -160,10 +203,15 @@ void SmartClockHmi::drawScreen(){
         bl->draw();
         tr->draw();
         br->draw();
-        M5.Lcd.drawRect(SLIDER1X +15, SLIDER1Y, 15, SLIDER1H, YELLOW);
+        M5.Lcd.drawRect(SLIDER1X +17, SLIDER1Y, 15, SLIDER1H, YELLOW);
         slide1->draw();
 
     } 
+    else if (screen == -2) {
+        slider1->setVisible(true);
+        slider2->setVisible(true);
+        slider3->setVisible(true);
+    }
     else {
         
     }
