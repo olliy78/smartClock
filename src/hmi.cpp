@@ -13,7 +13,7 @@
 //constructor
 SmartClockHmi::SmartClockHmi(){
     AlarmState = false;
-    screen = -2;
+    screen = 0;
     slide1pos = 0;
     hh = 0, mm = 0, ss = 0; 
     targetTime = 0;                    // for next 1 second timeout
@@ -35,8 +35,6 @@ void SmartClockHmi::init(){
     bl  = new Button(0, 110, 100, 100, false, "bottom-left", off_clrs, on_clrs, CC_DATUM);
     tr  = new Button(110, 0, 100, 100, false, "top-right", off_clrs, on_clrs, CC_DATUM);
     br  = new Button(110, 110, 100, 100, false, "bottom-right", off_clrs, on_clrs, CC_DATUM);
-
-    slide1  = new Button(SLIDER1X, (SLIDER1H - slide1pos) + SLIDER1Y - SLIDERH, SLIDERW, SLIDERH, false, "", on_clrs, on_clrs, CC_DATUM);
 
     slider1 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 10, 300);
     slider2 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 80, 300);
@@ -84,8 +82,6 @@ void SmartClockHmi::wipeScreen(int dir){
 }
 
 void SmartClockHmi::checkButtons() {
-
-
     if (M5.BtnA.wasPressed()) {
         screen --;
         if (screen < MIN_SCREEN) screen = MIN_SCREEN;
@@ -128,23 +124,6 @@ void SmartClockHmi::handlePressEvent(int x, int y){
     slider2->handlePressEvent(x,y);
     slider3->handlePressEvent(x,y);
 
-    if (screen == -1){
-        if ((x >= SLIDER1X && x <= SLIDER1X + SLIDERW) && (y >= SLIDER1Y && y <= SLIDER1Y + 30)){
-            Serial.println("Slider1 up");
-
-        }
-        if ((x >= SLIDER1X && x <= SLIDER1X + SLIDERW) && (y >= SLIDER1Y && y <= SLIDER1Y + 30)){
-            Serial.println("Slider1 up");
-
-        }
-
-
-    }
-/*
-    Serial.print(x);
-    Serial.print(" ");
-    Serial.println(y);
-*/
 }
 
 void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){    
@@ -153,31 +132,6 @@ void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){
     slider2->handleDragEvent(fromX, fromY, toX, toY);
     slider3->handleDragEvent(fromX, fromY, toX, toY);
     
-    Point fromPoint(fromX, fromY);
-    Point toPoint(toX, toY);
-    Zone slider1zone(SLIDER1X, (SLIDER1H - slide1pos) + SLIDER1Y - SLIDERH, SLIDERW, SLIDERH);
-
-    if (slider1zone.contains(fromPoint)){
-        Serial.println("Slider1 detected");
-        slide1->hide();
-        M5.Lcd.fillRect(SLIDER1X, (SLIDER1H - slide1pos) + SLIDER1Y - SLIDERH, SLIDERW, SLIDERH, BLACK);
-        M5.Lcd.drawRect(SLIDER1X +17, SLIDER1Y, 15, SLIDER1H, YELLOW);
-        slide1pos = SLIDER1Y + SLIDER1H -toY;
-        slide1->y = (SLIDER1Y + SLIDER1H) - slide1pos;
-        slide1->draw();
-
-        Serial.print("new position: ");
-        Serial.println(slide1pos);
-    }
-/*
-    Serial.print(fromX);
-    Serial.print(" ");
-    Serial.print(fromY);
-    Serial.print(" to ");
-    Serial.print(toX);
-    Serial.print(" ");
-    Serial.println(toY);
-*/
 }
 
 void SmartClockHmi::drawScreen(){
@@ -203,9 +157,6 @@ void SmartClockHmi::drawScreen(){
         bl->draw();
         tr->draw();
         br->draw();
-        M5.Lcd.drawRect(SLIDER1X +17, SLIDER1Y, 15, SLIDER1H, YELLOW);
-        slide1->draw();
-
     } 
     else if (screen == -2) {
         slider1->setVisible(true);
@@ -215,7 +166,7 @@ void SmartClockHmi::drawScreen(){
     else {
         
     }
-
+    //draw points for the selected screen
     if (screen == -2) M5.Lcd.fillCircle(120, 232, 5, TFT_WHITE);
     else M5.Lcd.drawCircle(120, 232, 5, TFT_WHITE);
     if (screen == -1) M5.Lcd.fillCircle(140, 232, 5, TFT_WHITE);
@@ -239,11 +190,9 @@ void SmartClockHmi::showClock(int redraw) {
     }
 
     if (targetTime < millis()) {
-        
         M5.Lcd.setTextDatum(TL_DATUM);
         // Set next update for 1 second later
         targetTime = millis() + 1000;
-
         // Adjust the time values by adding 1 second
         ss++;              // Advance second
         if (ss == 60) {    // Check for roll-over
@@ -258,8 +207,6 @@ void SmartClockHmi::showClock(int redraw) {
                 }
             }
         }
-
-
         // Update digital time
         int xpos = 0;
         int ypos = 10; // Top left corner ot clock text, about half way down
@@ -293,5 +240,4 @@ void SmartClockHmi::showClock(int redraw) {
             M5.Lcd.drawNumber(ss, xpos, ysecs, 6);                     // Draw seconds
         }
     }
-
 }
