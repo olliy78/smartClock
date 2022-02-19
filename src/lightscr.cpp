@@ -18,16 +18,21 @@ LightScreen::~LightScreen(){
 void LightScreen::init(){
     ButtonColors on_clrs = {TFT_YELLOW, TFT_BLACK, TFT_BLACK};
     ButtonColors off_clrs = {TFT_BLACK, TFT_YELLOW, TFT_YELLOW};
-    b_off  = new Button(0, 0, 100, 100, false, "b_off", off_clrs, on_clrs, CC_DATUM, 0, 0, 2);
-    b_on  = new Button(0, 110, 100, 100, false, "b_on", off_clrs, on_clrs, CC_DATUM);
-    b_szene1  = new Button(110, 0, 100, 100, false, "b_szene1", off_clrs, on_clrs, CC_DATUM);
-    b_szene2  = new Button(110, 110, 100, 100, false, "b_szene2", off_clrs, on_clrs, CC_DATUM);
+
+    b_on  = new Button(20, 0, 280, 50, false, "EIN", off_clrs, on_clrs, CC_DATUM);
+    b_szene1  = new Button(20, 60, 135, 50, false, "Szene 1", off_clrs, on_clrs, CC_DATUM);
+    b_szene2  = new Button(160, 60, 135, 50, false, "Szene 2", off_clrs, on_clrs, CC_DATUM);
+    b_off  = new Button(20, 120, 280, 50, false, "AUS", off_clrs, on_clrs, CC_DATUM);
+    slider = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 20, 170, 280);
+
+    slider->setValue(40);
 
 }
 
 void LightScreen::update(){
     M5.update();
     checkButtons();
+    slider->update();
 }
 
 void LightScreen::checkButtons(){
@@ -48,11 +53,11 @@ void LightScreen::checkButtons(){
 }
 
 void LightScreen::handleDragEvent(int fromX, int fromY, int toX, int toY){
-
+    slider->handleDragEvent(fromX, fromY, toX, toY);
 }
 
 void LightScreen::handlePressEvent(int x, int y){
-
+    slider->handlePressEvent(x,y);
 }
 
 
@@ -63,10 +68,12 @@ void LightScreen::drawScreen(bool draw){
         b_on->draw();
         b_szene1->draw();
         b_szene2->draw();
+        slider->setVisible(true);
     } else {
         b_off->hide();
         b_on->hide();
         b_szene1->hide();
         b_szene2->hide();
+        slider->setVisible(false);
     }
 }

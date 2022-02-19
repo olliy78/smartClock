@@ -12,7 +12,7 @@
 
 //constructor
 SmartClockHmi::SmartClockHmi(){    
-    screen = 0;
+    screen = -1;
 }
 
 //destructor
@@ -65,8 +65,6 @@ void SmartClockHmi::update(){
 }
 
 void SmartClockHmi::wipeScreen(int dir){
-    Serial.println("wipe");
-
     if (dir > 0) screen--;
     else screen ++;
     if (screen < MIN_SCREEN) screen = MIN_SCREEN;
