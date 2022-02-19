@@ -58,7 +58,6 @@ public:
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
     void handlePressEvent(int x, int y);
-
 };
 
 
@@ -80,7 +79,46 @@ class AlarmScreen: public Screen {
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
     void handlePressEvent(int x, int y);
+};
 
+class LightScreen: public Screen {
+
+    
+    bool _isactive;
+    Button *b_off, *b_on, *b_szene1, *b_szene2;
+    SmartSlider *slider;
+    
+    
+    void checkButtons();
+
+    public:
+    LightScreen();
+    ~LightScreen();
+    void init();
+    void update();
+    void drawScreen(bool draw);
+    void handleDragEvent(int fromX, int fromY, int toX, int toY);
+    void handlePressEvent(int x, int y);
+};
+
+class SzeneScreen: public Screen {
+
+    
+    bool _isactive;
+    Button *b_off, *b_on, *b_szene1, *b_szene2;
+    SmartSlider *slider1, *slider2, *slider3;
+    
+    
+    void checkButtons();
+
+    public:
+    SzeneScreen();
+    ~SzeneScreen();
+    void init();
+    void update();
+    void drawScreen(bool draw);
+    void handleDragEvent(int fromX, int fromY, int toX, int toY);
+    void handlePressEvent(int x, int y);
 };
 
 
@@ -93,9 +131,10 @@ class SmartClockHmi{
     Screen *actscr;
     MainScreen *mainscr;
     AlarmScreen *alarmscr;
+    LightScreen *lightscr;
+    SzeneScreen *szenescr;
 
-    //button objects
-    Button *tl, *bl, *tr, *br, *slide1;
+    //Gesture objects
     Gesture *swipeLeft, *swipeRight;
 
     SmartSlider *slider1, *slider2, *slider3;

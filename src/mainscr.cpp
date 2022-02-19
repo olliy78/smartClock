@@ -33,15 +33,17 @@ void MainScreen::update(){
 }
 
 void MainScreen::checkButtons() {
-    if (alarmbtn->wasPressed()){
-        //Serial.println("Alarm");
-        AlarmState = !AlarmState;
-        if (AlarmState){
-            alarmbtn->setLabel("Alarm ON");
-            alarmbtn->off.bg = RED;
-        } else {
-            alarmbtn->setLabel("Alarm OFF");
-            alarmbtn->off.bg = BLACK;
+    if (_isactive){
+        if (alarmbtn->wasPressed()){
+            //Serial.println("Alarm");
+            AlarmState = !AlarmState;
+            if (AlarmState){
+                alarmbtn->setLabel("Alarm ON");
+                alarmbtn->off.bg = RED;
+            } else {
+                alarmbtn->setLabel("Alarm OFF");
+                alarmbtn->off.bg = BLACK;
+            }
         }
     }
 }
@@ -55,8 +57,7 @@ void MainScreen::handleDragEvent(int fromX, int fromY, int toX, int toY){
 }
 
 void MainScreen::drawScreen(bool draw){
-    
-    _isactive = draw;
+     _isactive = draw;
     if (draw){
         showClock(1);
         alarmbtn->draw();

@@ -24,28 +24,16 @@ SmartClockHmi::~SmartClockHmi(){
 void SmartClockHmi::init(){
     //Screens
     mainscr = new MainScreen();
-    mainscr->init();
     alarmscr = new AlarmScreen();
+    lightscr = new LightScreen();
+    szenescr = new SzeneScreen();
+    mainscr->init();
     alarmscr->init();
-
-    //buttons
-    ButtonColors on_clrs = {TFT_YELLOW, TFT_BLACK, TFT_BLACK};
-    ButtonColors off_clrs = {TFT_BLACK, TFT_YELLOW, TFT_YELLOW};
-    tl  = new Button(0, 0, 100, 100, false, "top-left", off_clrs, on_clrs, CC_DATUM, 0, 0, 2);
-    bl  = new Button(0, 110, 100, 100, false, "bottom-left", off_clrs, on_clrs, CC_DATUM);
-    tr  = new Button(110, 0, 100, 100, false, "top-right", off_clrs, on_clrs, CC_DATUM);
-    br  = new Button(110, 110, 100, 100, false, "bottom-right", off_clrs, on_clrs, CC_DATUM);
-
-    slider1 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 10, 300);
-    slider2 = new SmartSlider(SL_HIRIZONTAL, SL_COLORPICKER, 10, 80, 300);
-    slider3 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 150, 300);
-
+    lightscr->init();
+    szenescr->init();
+    
     swipeLeft = new Gesture("swipe left", 75, DIR_LEFT, 30, false, 500U);
     swipeRight = new Gesture("swipe right", 75, DIR_RIGHT, 30, false, 500U);
-
-    slider1->setValue(20);
-    slider2->setValue(40);
-    slider3->setValue(60);
     
     drawScreen();
 }
@@ -64,16 +52,12 @@ void SmartClockHmi::update(){
     if (screen == 0){
         mainscr->update();
     } else if (screen == -1){
-        
+        lightscr->update();
     } else 
     if (screen == -2){
-        //update slider
-        slider1->update();
-        slider2->update();
-        slider3->update();
+        szenescr->update();
     } else if (screen == 1){
         alarmscr->update();
-
     } else if (screen == 2){
         
     } 
@@ -105,39 +89,29 @@ void SmartClockHmi::checkButtons() {
         if (screen > MAX_SCREEN) screen = MAX_SCREEN;
         drawScreen();
     }
-
-    if (tl->wasPressed()){
-        Serial.println("tl");
-    }
-
 }
 
 void SmartClockHmi::handlePressEvent(int x, int y){
-    slider1->handlePressEvent(x,y);
-    slider2->handlePressEvent(x,y);
-    slider3->handlePressEvent(x,y);
+    mainscr->handlePressEvent(x, y);
     alarmscr->handlePressEvent(x,y);
+    lightscr->handlePressEvent(x, y);
+    szenescr->handlePressEvent(x, y);
 }
 
 void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){    
-    slider1->handleDragEvent(fromX, fromY, toX, toY);
-    slider2->handleDragEvent(fromX, fromY, toX, toY);
-    slider3->handleDragEvent(fromX, fromY, toX, toY);
+    mainscr->handleDragEvent(fromX, fromY, toX, toY);
+    alarmscr->handleDragEvent(fromX, fromY, toX, toY);
+    lightscr->handleDragEvent(fromX, fromY, toX, toY);
+    szenescr->handleDragEvent(fromX, fromY, toX, toY);
 }
 
 void SmartClockHmi::drawScreen(){
     //deactivate screens
     mainscr->drawScreen(false);
     alarmscr->drawScreen(false);
+    lightscr->drawScreen(false);
+    szenescr->drawScreen(false);
 
-    //hide all buttons
-    tl->hide();
-    bl->hide();
-    tr->hide();
-    br->hide();
-    slider1->setVisible(false);
-    slider2->setVisible(false);
-    slider3->setVisible(false);
     //clear screen
     M5.Lcd.fillScreen(TFT_BLACK);
     // show buttons
@@ -145,15 +119,10 @@ void SmartClockHmi::drawScreen(){
         mainscr->drawScreen(true);
     } 
     else if (screen == -1) {
-        tl->draw();
-        bl->draw();
-        tr->draw();
-        br->draw();
+        lightscr->drawScreen(true);
     } 
     else if (screen == -2) {
-        slider1->setVisible(true);
-        slider2->setVisible(true);
-        slider3->setVisible(true);
+        szenescr->drawScreen(true);
     }
     else  if (screen == 1){
         alarmscr->drawScreen(true);
