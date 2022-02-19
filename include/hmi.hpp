@@ -2,10 +2,12 @@
     Software for SmartWatch by olliy78
 
 */
+#pragma once
 
 
 #include "main.hpp"
 #include "slider.hpp"
+#include "model.hpp"
 
 //HMI specific definitions
 #define SLIDERH 40
@@ -17,24 +19,91 @@
 
 using namespace std;
 
+
+class Screen {
+
+    
+    
+
+    protected:
+
+    bool _isactive;
+    void checkButtons();
+
+    public:
+    void init();
+    void update();
+    void drawScreen(bool draw);
+    void handleDragEvent(int fromX, int fromY, int toX, int toY);
+    void handlePressEvent(int x, int y);
+
+    
+};
+
+class MainScreen: public Screen {
+
+    Button *alarmbtn;
+    uint8_t _hh, _mm, _ss; 
+    uint32_t targetTime;                    // for next 1 second timeout
+    bool AlarmState;
+
+    void showClock(int redraw);
+    void checkButtons();
+
+public:
+    MainScreen();
+    ~MainScreen();
+    void init();
+    void update();
+    void drawScreen(bool draw);
+    void handleDragEvent(int fromX, int fromY, int toX, int toY);
+    void handlePressEvent(int x, int y);
+
+};
+
+
+
+class AlarmScreen: public Screen {
+
+    int _hh, _mm;
+    bool _isactive;
+    Button *b_m, *b_tu, *b_w, *b_th, *b_f, *b_sa, *b_su, *b_al1, *b_al2;
+    
+    void showClock();
+    void checkButtons();
+
+    public:
+    AlarmScreen();
+    ~AlarmScreen();
+    void init();
+    void update();
+    void drawScreen(bool draw);
+    void handleDragEvent(int fromX, int fromY, int toX, int toY);
+    void handlePressEvent(int x, int y);
+
+};
+
+
 class SmartClockHmi{
     //private
     int screen;
     
-    uint8_t hh, mm, ss; 
-    uint32_t targetTime;                    // for next 1 second timeout
-    bool AlarmState;
+
+    //Screen Objects
+    Screen *actscr;
+    MainScreen *mainscr;
+    AlarmScreen *alarmscr;
+
     //button objects
-    Button *alarmbtn, *tl, *bl, *tr, *br, *slide1;
+    Button *tl, *bl, *tr, *br, *slide1;
     Gesture *swipeLeft, *swipeRight;
-    int slide1pos;
 
     SmartSlider *slider1, *slider2, *slider3;
 
     // private functions
     void checkButtons();
     void drawScreen();
-    void showClock(int redraw);
+    
     void doButtons();
 
 
@@ -48,3 +117,4 @@ public:
     void handlePressEvent(int x, int y);
     
 };
+

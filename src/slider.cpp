@@ -159,6 +159,6 @@ void SmartSlider::draw(){
             M5.Lcd.drawRect(_Xpos, _Ypos, SL_WIDTH, _length, RED);
         }
     } else {
-        //_button.
+        _button->hide();
     }   
 }

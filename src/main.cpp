@@ -28,7 +28,8 @@ void setup() {
   //M5.Buttons.addHandler(wipeScr, E_GESTURE);
   //M5.Buttons.addHandler(toggleColor, E_DBLTAP);
   //M5.Buttons.addHandler(buttonDragged, E_DRAGGED);
-  M5.Buttons.addHandler(buttonPressed, E_TOUCH + E_RELEASE);
+  //M5.Buttons.addHandler(buttonPressed, E_TOUCH + E_RELEASE);
+  M5.Buttons.addHandler(buttonPressed, E_TOUCH);
   M5.Buttons.addHandler(buttonDragged, E_MOVE + E_DRAGGED);
   //swipeDown.addHandler(wipeScr, E_GESTURE);
 

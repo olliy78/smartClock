@@ -11,12 +11,8 @@
 
 
 //constructor
-SmartClockHmi::SmartClockHmi(){
-    AlarmState = false;
-    screen = -2;
-    hh = 0, mm = 0, ss = 0; 
-    targetTime = 0;                    // for next 1 second timeout
-
+SmartClockHmi::SmartClockHmi(){    
+    screen = 0;
 }
 
 //destructor
@@ -26,9 +22,15 @@ SmartClockHmi::~SmartClockHmi(){
 
 //init HMI
 void SmartClockHmi::init(){
+    //Screens
+    mainscr = new MainScreen();
+    mainscr->init();
+    alarmscr = new AlarmScreen();
+    alarmscr->init();
+
+    //buttons
     ButtonColors on_clrs = {TFT_YELLOW, TFT_BLACK, TFT_BLACK};
     ButtonColors off_clrs = {TFT_BLACK, TFT_YELLOW, TFT_YELLOW};
-    alarmbtn = new Button(0, 120, 320, 100, false ,"Alarm OFF", off_clrs, on_clrs, CC_DATUM, 0, 0, 2);
     tl  = new Button(0, 0, 100, 100, false, "top-left", off_clrs, on_clrs, CC_DATUM, 0, 0, 2);
     bl  = new Button(0, 110, 100, 100, false, "bottom-left", off_clrs, on_clrs, CC_DATUM);
     tr  = new Button(110, 0, 100, 100, false, "top-right", off_clrs, on_clrs, CC_DATUM);
@@ -60,12 +62,22 @@ void SmartClockHmi::update(){
     checkButtons();
 
     if (screen == 0){
-        showClock(0);
-    }
-    //update slider
-    slider1->update();
-    slider2->update();
-    slider3->update();
+        mainscr->update();
+    } else if (screen == -1){
+        
+    } else 
+    if (screen == -2){
+        //update slider
+        slider1->update();
+        slider2->update();
+        slider3->update();
+    } else if (screen == 1){
+        alarmscr->update();
+
+    } else if (screen == 2){
+        
+    } 
+    
 }
 
 void SmartClockHmi::wipeScreen(int dir){
@@ -93,17 +105,6 @@ void SmartClockHmi::checkButtons() {
         if (screen > MAX_SCREEN) screen = MAX_SCREEN;
         drawScreen();
     }
-    if (alarmbtn->wasPressed()){
-        //Serial.println("Alarm");
-        AlarmState = !AlarmState;
-        if (AlarmState){
-            alarmbtn->setLabel("Alarm ON");
-            alarmbtn->off.bg = RED;
-        } else {
-            alarmbtn->setLabel("Alarm OFF");
-            alarmbtn->off.bg = BLACK;
-        }
-    }
 
     if (tl->wasPressed()){
         Serial.println("tl");
@@ -115,6 +116,7 @@ void SmartClockHmi::handlePressEvent(int x, int y){
     slider1->handlePressEvent(x,y);
     slider2->handlePressEvent(x,y);
     slider3->handlePressEvent(x,y);
+    alarmscr->handlePressEvent(x,y);
 }
 
 void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){    
@@ -124,8 +126,11 @@ void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){
 }
 
 void SmartClockHmi::drawScreen(){
+    //deactivate screens
+    mainscr->drawScreen(false);
+    alarmscr->drawScreen(false);
+
     //hide all buttons
-    alarmbtn->hide();
     tl->hide();
     bl->hide();
     tr->hide();
@@ -137,8 +142,7 @@ void SmartClockHmi::drawScreen(){
     M5.Lcd.fillScreen(TFT_BLACK);
     // show buttons
     if (screen == 0){
-        alarmbtn->draw();
-        showClock(1);
+        mainscr->drawScreen(true);
     } 
     else if (screen == -1) {
         tl->draw();
@@ -151,8 +155,8 @@ void SmartClockHmi::drawScreen(){
         slider2->setVisible(true);
         slider3->setVisible(true);
     }
-    else {
-        
+    else  if (screen == 1){
+        alarmscr->drawScreen(true);
     }
     //draw points for the selected screen
     if (screen == -2) M5.Lcd.fillCircle(120, 232, 5, TFT_WHITE);
@@ -167,64 +171,3 @@ void SmartClockHmi::drawScreen(){
     else M5.Lcd.drawCircle(200, 232, 5, TFT_WHITE);
 }
 
-void SmartClockHmi::showClock(int redraw) {
-    static int omm = 99, oss = 99;
-    static int xcolon = 0, xsecs = 0;
-
-    if (redraw){
-        omm = 99;
-        oss = 99;
-    }
-
-    if (targetTime < millis()) {
-        M5.Lcd.setTextDatum(TL_DATUM);
-        // Set next update for 1 second later
-        targetTime = millis() + 1000;
-        // Adjust the time values by adding 1 second
-        ss++;              // Advance second
-        if (ss == 60) {    // Check for roll-over
-        ss = 0;          // Reset seconds to zero
-        omm = mm;        // Save last minute time for display update
-        mm++;            // Advance minute
-            if (mm > 59) {   // Check for roll-over
-                mm = 0;
-                hh++;          // Advance hour
-                if (hh > 23) { // Check for 24hr roll-over (could roll-over on 13)
-                hh = 0;      // 0 for 24 hour clock, set to 1 for 12 hour clock
-                }
-            }
-        }
-        // Update digital time
-        int xpos = 0;
-        int ypos = 10; // Top left corner ot clock text, about half way down
-        int ysecs = ypos + 24;
-
-        if (omm != mm) { // Redraw hours and minutes time every minute
-            omm = mm;
-            // Draw hours and minutes
-            M5.Lcd.setTextDatum(TL_DATUM);
-            M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
-            //M5.Lcd.setTextFont(7);
-            //M5.Lcd.setTextSize(2);
-            //M5.Lcd.drawString("12:34:56", xpos, ypos);
-            //M5.Lcd.drawNumber(12, xpos, ypos);
-            if (hh < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add hours leading zero for 24 hr clock
-            xpos += M5.Lcd.drawNumber(hh, xpos, ypos, 8);             // Draw hours
-            xcolon = xpos; // Save colon coord for later to flash on/off later
-            xpos += M5.Lcd.drawChar(':', xpos, ypos - 8, 8);
-            if (mm < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
-            xpos += M5.Lcd.drawNumber(mm, xpos, ypos, 8);             // Draw minutes
-            xsecs = xpos; // Sae seconds 'x' position for later display updates
-        }
-        if (oss != ss) { // Redraw seconds time every second
-            oss = ss;
-            xpos = xsecs;
-            //M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
-            //M5.Lcd.setTextFont(7);
-            xpos += M5.Lcd.drawChar(':', xsecs, ysecs, 6); // Seconds colon
-            //Draw seconds
-            if (ss < 10) xpos += M5.Lcd.drawChar('0', xpos, ysecs, 6); // Add leading zero
-            M5.Lcd.drawNumber(ss, xpos, ysecs, 6);                     // Draw seconds
-        }
-    }
-}

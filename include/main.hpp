@@ -2,6 +2,7 @@
     Software for SmartWatch by olliy78
 
 */
+#pragma once
 
 
 #include <Arduino.h>
