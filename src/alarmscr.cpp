@@ -34,11 +34,12 @@ void AlarmScreen::init(){
 
 }
 
+void AlarmScreen::setDataModel(DataModel *m){
+    model = m;
+}
+
 void AlarmScreen::update(){
-    if (_isactive){
-        M5.update();
-        checkButtons();
-    }
+    checkButtons();
 }
 
 void AlarmScreen::handleDragEvent(int fromX, int fromY, int toX, int toY){

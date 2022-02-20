@@ -42,6 +42,7 @@ class Screen {
 
 class MainScreen: public Screen {
 
+    DataModel *model = nullptr;
     Button *alarmbtn;
     uint8_t _hh, _mm, _ss; 
     uint32_t targetTime;                    // for next 1 second timeout
@@ -54,6 +55,7 @@ public:
     MainScreen();
     ~MainScreen();
     void init();
+    void setDataModel(DataModel *m);
     void update();
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
@@ -64,6 +66,7 @@ public:
 
 class AlarmScreen: public Screen {
 
+    DataModel *model = nullptr;
     int _hh, _mm;
     bool _isactive;
     Button *b_m, *b_tu, *b_w, *b_th, *b_f, *b_sa, *b_su, *b_al1, *b_al2;
@@ -75,6 +78,7 @@ class AlarmScreen: public Screen {
     AlarmScreen();
     ~AlarmScreen();
     void init();
+    void setDataModel(DataModel *m);
     void update();
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
@@ -83,18 +87,21 @@ class AlarmScreen: public Screen {
 
 class LightScreen: public Screen {
 
-    
+    DataModel *model = nullptr;
     bool _isactive;
-    Button *b_off, *b_on, *b_szene1, *b_szene2;
-    SmartSlider *slider;
+    Button *b_ceiling, *b_cupboard;
+    SmartSlider *slider1, *slider2, *slider3;
+    
     
     
     void checkButtons();
+    void updateData();
 
     public:
     LightScreen();
     ~LightScreen();
     void init();
+    void setDataModel(DataModel *m);
     void update();
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
@@ -103,10 +110,10 @@ class LightScreen: public Screen {
 
 class SzeneScreen: public Screen {
 
-    
+    DataModel *model = nullptr;
     bool _isactive;
     Button *b_off, *b_on, *b_szene1, *b_szene2;
-    SmartSlider *slider1, *slider2, *slider3;
+    SmartSlider *slider;
     
     
     void checkButtons();
@@ -115,6 +122,7 @@ class SzeneScreen: public Screen {
     SzeneScreen();
     ~SzeneScreen();
     void init();
+    void setDataModel(DataModel *m);
     void update();
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
@@ -124,6 +132,7 @@ class SzeneScreen: public Screen {
 
 class SmartClockHmi{
     //private
+    DataModel *model = nullptr;
     int screen;
     
 
@@ -142,7 +151,6 @@ class SmartClockHmi{
     // private functions
     void checkButtons();
     void drawScreen();
-    
     void doButtons();
 
 
@@ -150,6 +158,7 @@ public:
     SmartClockHmi();
     ~SmartClockHmi();
     void init();
+    void setDataModel(DataModel *m);
     void update();
     void wipeScreen(int dir);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);

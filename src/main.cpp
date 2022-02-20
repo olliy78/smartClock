@@ -6,9 +6,11 @@
 //includes
 #include "main.hpp"
 #include "hmi.hpp"
+#include "model.hpp"
 
 //global objects
 SmartClockHmi *hmi = new SmartClockHmi();       //global HMI Object
+DataModel *model = new DataModel();             //global Data Model
 
 void buttonDragged(Event& e) {
   hmi->handleDragEvent(e.from.x, e.from.y, e.to.x, e.to.y);
@@ -20,11 +22,13 @@ void buttonPressed(Event& e) {
 
 void setup() {
   // put your setup code here, to run once:
-  M5.begin();
-  hmi->init();
   Serial.begin(115200);
   Serial.printf("Hello World!\n");
-
+  model = new DataModel();
+  M5.begin();
+  hmi->init();
+  hmi->setDataModel(model);
+  
   //M5.Buttons.addHandler(wipeScr, E_GESTURE);
   //M5.Buttons.addHandler(toggleColor, E_DBLTAP);
   //M5.Buttons.addHandler(buttonDragged, E_DRAGGED);

@@ -25,9 +25,12 @@ void MainScreen::init(){
     alarmbtn = new Button(0, 120, 320, 100, false ,"Alarm OFF", off_clrs, on_clrs, CC_DATUM, 0, 0, 2);
 }
 
+void MainScreen::setDataModel(DataModel *m){
+    model = m;
+}
+
 //update HMI
 void MainScreen::update(){
-    M5.update();
     checkButtons();
     showClock(0);
 }

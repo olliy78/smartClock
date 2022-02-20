@@ -38,30 +38,36 @@ void SmartClockHmi::init(){
     drawScreen();
 }
 
+void SmartClockHmi::setDataModel(DataModel *m){
+    model = m;
+    mainscr->setDataModel(m);
+    alarmscr->setDataModel(m);
+    lightscr->setDataModel(m);
+    szenescr->setDataModel(m);
+}
+
 //update HMI
 void SmartClockHmi::update(){
     M5.update();
     if (swipeRight->wasDetected()){
         wipeScreen(1);
-    } 
-    if (swipeLeft->wasDetected()){
+    } else if (swipeLeft->wasDetected()){
         wipeScreen(-1);
-    }
-    checkButtons();
+    } else {                    //if there was a swipe no other elements should be checked
+        checkButtons();
 
-    if (screen == 0){
-        mainscr->update();
-    } else if (screen == -1){
-        lightscr->update();
-    } else 
-    if (screen == -2){
-        szenescr->update();
-    } else if (screen == 1){
-        alarmscr->update();
-    } else if (screen == 2){
-        
-    } 
-    
+        if (screen == 0){
+            mainscr->update();
+        } else if (screen == -1){
+            lightscr->update();
+        } else if (screen == -2){
+            szenescr->update();
+        } else if (screen == 1){
+            alarmscr->update();
+        } else if (screen == 2){
+            
+        } 
+    }
 }
 
 void SmartClockHmi::wipeScreen(int dir){

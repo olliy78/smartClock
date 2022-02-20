@@ -16,50 +16,67 @@ SzeneScreen::~SzeneScreen(){
 }
 
 void SzeneScreen::init(){
-    slider1 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 10, 300);
-    slider2 = new SmartSlider(SL_HIRIZONTAL, SL_COLORPICKER, 10, 80, 300);
-    slider3 = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 10, 150, 300);
-    slider1->setValue(20);
-    slider2->setValue(40);
-    slider3->setValue(60);
 
+    ButtonColors on_clrs = {TFT_YELLOW, TFT_BLACK, TFT_BLACK};
+    ButtonColors off_clrs = {TFT_BLACK, TFT_YELLOW, TFT_YELLOW};
+
+    b_on  = new Button(20, 0, 230, 50, false, "EIN", off_clrs, on_clrs, CC_DATUM);
+    b_szene1  = new Button(20, 60, 110, 50, false, "Szene 1", off_clrs, on_clrs, CC_DATUM);
+    b_szene2  = new Button(135, 60, 110, 50, false, "Szene 2", off_clrs, on_clrs, CC_DATUM);
+    b_off  = new Button(20, 120, 230, 50, false, "AUS", off_clrs, on_clrs, CC_DATUM);
+    //slider = new SmartSlider(SL_HIRIZONTAL, SL_SIMPLE, 20, 170, 230);
+    slider = new SmartSlider(SL_VERTICAL, SL_SIMPLE, 255, 0, 230);
+
+    slider->setValue(50);    
+}
+
+void SzeneScreen::setDataModel(DataModel *m){
+    model = m;
 }
 
 void SzeneScreen::update(){
-    M5.update();
     checkButtons();
-    slider1->update();
-    slider2->update();
-    slider3->update();
-
-}
-
-void SzeneScreen::handleDragEvent(int fromX, int fromY, int toX, int toY){
-    slider1->handleDragEvent(fromX, fromY, toX, toY);
-    slider2->handleDragEvent(fromX, fromY, toX, toY);
-    slider3->handleDragEvent(fromX, fromY, toX, toY);
-}
-
-void SzeneScreen::handlePressEvent(int x, int y){
-    slider1->handlePressEvent(x,y);
-    slider2->handlePressEvent(x,y);
-    slider3->handlePressEvent(x,y);
+    slider->update();
 }
 
 void SzeneScreen::checkButtons(){
+    if (_isactive){
+        if (b_off->wasPressed()){
+            Serial.println("b_off");
+        }
+        if (b_on->wasPressed()){
+            Serial.println("b_on");
+        }
+        if (b_szene1->wasPressed()){
+            Serial.println("b_szene1");
+        }
+        if (b_szene2->wasPressed()){
+            Serial.println("b_szene2");
+        }
+    }
+}
 
+void SzeneScreen::handleDragEvent(int fromX, int fromY, int toX, int toY){
+    slider->handleDragEvent(fromX, fromY, toX, toY);
+}
+
+void SzeneScreen::handlePressEvent(int x, int y){
+    slider->handlePressEvent(x,y);
 }
 
 void SzeneScreen::drawScreen(bool draw){
     _isactive = draw;
     if (draw){
-        slider1->setVisible(true);
-        slider2->setVisible(true);
-        slider3->setVisible(true);
+        b_off->draw();
+        b_on->draw();
+        b_szene1->draw();
+        b_szene2->draw();
+        slider->setVisible(true);
     } else {
-        //hide all buttons
-        slider1->setVisible(false);
-        slider2->setVisible(false);
-        slider3->setVisible(false);
-    }    
+        b_off->hide();
+        b_on->hide();
+        b_szene1->hide();
+        b_szene2->hide();
+        slider->setVisible(false);
+    }
 }

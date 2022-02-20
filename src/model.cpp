@@ -7,6 +7,13 @@
 #include "model.hpp"
 
 DataModel::DataModel(){
+    Serial.println("Model created");
+    //some initializations
+    alscrnr = 0;
+    lightscrnr = 0;
+
+    //read from eeprom
+    initializeModel();
 
 }
 
@@ -15,6 +22,11 @@ DataModel::~DataModel(){
 }
 
 void DataModel::initializeModel(){
+    Serial.println("initialize Data");
+    eep.elements.al1hh = 12;
+    eep.elements.al1mm = 34;
+    eep.elements.al2hh = 21;
+    eep.elements.al2mm = 43;
 
 }
 

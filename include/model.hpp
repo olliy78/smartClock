@@ -28,10 +28,19 @@ public:
         struct {
             int length;                             //length of the EEPROM data block
             uint32_t serialnr;                       //serial number value must be the same as the shadowSerialnr
-            
+            uint8_t al1hh;                          //HH alarm 1
+            uint8_t al1mm;                          //MM alarm 1
+            uint8_t al2hh;                          //HH alarm 2
+            uint8_t al2mm;                          //MM alarm 2
             uint32_t shadowSerialnr;
         }elements;
     } eep;
+
+    //temporary Data elements
+    //to be initialized in constructor
+    uint8_t alscrnr;        //which alarm is selected on alarm screen
+    uint8_t lightscrnr;     //which Lamp is selected on light screen
+
 
     DataModel();
     ~DataModel();
