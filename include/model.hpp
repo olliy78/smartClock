@@ -5,9 +5,10 @@
 #pragma once
 
 #include <stdio.h>
+
 #include "main.hpp"
 
- #define BYTESINEEPROM 8        //number ob bytes stored in EEPROM
+ #define BYTESINEEPROM 80        //number ob bytes stored in EEPROM
 
 struct LightValues {
     uint8_t white, color, intense;
@@ -36,7 +37,9 @@ public:
         uint8_t bytes[BYTESINEEPROM];         //byte elements to read and write byte-wise
         struct {
             int length;                             //length of the EEPROM data block
-            uint32_t serialnr;                       //serial number value must be the same as the shadowSerialnr
+            uint32_t serialnr;                      //serial number value must be the same as the shadowSerialnr
+            char wifipsk[20];                       //WIFI PSK
+            char wifissid[20];                      //WIFI SSID
             uint8_t al1hh;                          //HH alarm 1
             uint8_t al1mm;                          //MM alarm 1
             uint8_t al2hh;                          //HH alarm 2

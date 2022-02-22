@@ -7,13 +7,11 @@
 #include "model.hpp"
 
 DataModel::DataModel(){
-    Serial.println("Model created");
     //some initializations
+    EEPROM.begin(BYTESINEEPROM);
     alscrnr = 0;
     lightscrnr = 0;
 
-    //read from eeprom
-    initializeModel();
 
 }
 
@@ -37,11 +35,59 @@ void DataModel::initializeModel(){
 }
 
 void DataModel::readEEProm(){
+    debug_println("Read EEPROM");
+    EEPROM.begin(BYTESINEEPROM);
+    for (uint16_t i=0; i<BYTESINEEPROM; i++){
+        eep.bytes[i] = EEPROM.readByte(i);
+        //debug_print(i);
+        //debug_print(" r:");
+        debug_printHex(EEPROM.readByte(i));
+        debug_print(" ");
+    }
 
+    debug_print("sizeof(eep.elements): ");
+    debug_println(sizeof(eep.elements));
+    debug_print("eep.elements.serialnr: ");
+    debug_println(eep.elements.serialnr);
+    debug_print("eep.elements.shadowSerialnr: ");
+    debug_println(eep.elements.shadowSerialnr);
+
+    if (eep.elements.length == BYTESINEEPROM && (eep.elements.serialnr == eep.elements.shadowSerialnr)){
+        debug_println("EEProm valide");
+    } else {
+        debug_println("EEProm invalide --> initialize model");
+        initializeModel();
+    }
 }
 
 void DataModel::saveEEProm(){
+    bool eeperror = false;
+ 
+    debug_print("writing EEPROM ");
+    debug_print(BYTESINEEPROM);
+    debug_println(" Bytes");
+    eep.elements.length = BYTESINEEPROM;  //store the size inside Data
 
+    for (int i=0; i<BYTESINEEPROM; i++){
+        EEPROM.writeByte(i, eep.bytes[i]);
+        EEPROM.commit();
+        debug_print(".");
+    }
+    //EEPROM.commit();
+    debug_println(" ");
+    debug_print("verifying EEPROM : ");
+    for (uint16_t i=0; i<BYTESINEEPROM; i++){
+        if(eep.bytes[i] != EEPROM.readByte(i)){
+            eeperror = true;
+            debug_print(i);
+            debug_print(" w:");
+            debug_printHex(eep.bytes[i]);
+            debug_print(" r:");
+            debug_printHexln(EEPROM.readByte(i));
+        }
+    }
+    if (eeperror)debug_println("error");
+    else debug_println("done");
 }
 
 bool DataModel::isModeValide(int mode, int port){
