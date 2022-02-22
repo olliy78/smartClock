@@ -23,11 +23,17 @@ DataModel::~DataModel(){
 
 void DataModel::initializeModel(){
     Serial.println("initialize Data");
-    eep.elements.al1hh = 12;
-    eep.elements.al1mm = 34;
-    eep.elements.al2hh = 21;
-    eep.elements.al2mm = 43;
 
+    for (int i=0; i<2; i++){
+        eep.elements.lightv[i].white = 20;
+        eep.elements.lightv[i].color = 30;
+        eep.elements.lightv[i].intense = 40;
+        eep.elements.alarmv[i].hh = 12;
+        eep.elements.alarmv[i].mm = 34;
+        for (int d=0; d<7; d++){
+            eep.elements.alarmv[i].day[d] = true;    
+        }
+    }
 }
 
 void DataModel::readEEProm(){
@@ -39,7 +45,7 @@ void DataModel::saveEEProm(){
 }
 
 bool DataModel::isModeValide(int mode, int port){
-
+    return true;
 }
 
 //crc16 checksum

@@ -42,10 +42,21 @@ rgbcolor SmartSlider::getColor(){
 
 //set the value in range 0 ... 100 if the value changed, the element will redraw
 void SmartSlider::setValue(int newval){
-    //ToDo: blank current position
     
-    _sliderpos = newval;
-
+    //if visible blank current position and draw the new one
+    if (_visible){
+        if (_orientation == SL_HIRIZONTAL){
+            int pos = _sliderpos * ((_length - SL_HIGHT) * 0.01) + _Xpos;       //current slider position 
+            Zone sliderZone(pos, _Ypos, SL_HIGHT, SL_WIDTH);
+            M5.Lcd.fillRect(sliderZone.x, sliderZone.y, sliderZone.w, sliderZone.h, BLACK);
+        } else {
+            int pos = (100 - _sliderpos) * ((_length - SL_HIGHT) * 0.01) + _Ypos;       //current slider position 
+            Zone sliderZone(_Xpos, pos, SL_WIDTH, SL_HIGHT);
+            M5.Lcd.fillRect(sliderZone.x, sliderZone.y, sliderZone.w, sliderZone.h, BLACK);
+        }
+        
+    }
+    _sliderpos = newval;    
     //draw Slider
     draw();
 }

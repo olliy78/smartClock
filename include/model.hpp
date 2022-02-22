@@ -9,6 +9,15 @@
 
  #define BYTESINEEPROM 8        //number ob bytes stored in EEPROM
 
+struct LightValues {
+    uint8_t white, color, intense;
+};
+
+struct AlarmValues {
+    uint8_t hh, mm;
+    bool day[7];
+};
+
 class DataModel {          //data model
     //private
     //helper functions
@@ -32,6 +41,8 @@ public:
             uint8_t al1mm;                          //MM alarm 1
             uint8_t al2hh;                          //HH alarm 2
             uint8_t al2mm;                          //MM alarm 2
+            LightValues lightv[2];
+            AlarmValues alarmv[2];
             uint32_t shadowSerialnr;
         }elements;
     } eep;

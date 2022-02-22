@@ -12,7 +12,7 @@
 
 //constructor
 SmartClockHmi::SmartClockHmi(){    
-    screen = -1;
+
 }
 
 //destructor
@@ -35,7 +35,6 @@ void SmartClockHmi::init(){
     swipeLeft = new Gesture("swipe left", 75, DIR_LEFT, 30, false, 500U);
     swipeRight = new Gesture("swipe right", 75, DIR_RIGHT, 30, false, 500U);
     
-    drawScreen();
 }
 
 void SmartClockHmi::setDataModel(DataModel *m){
@@ -46,14 +45,19 @@ void SmartClockHmi::setDataModel(DataModel *m){
     szenescr->setDataModel(m);
 }
 
+void SmartClockHmi::selectScreen(int s){
+    screen = s;
+    drawScreen();
+}
+
 //update HMI
 void SmartClockHmi::update(){
     M5.update();
-    if (swipeRight->wasDetected()){
-        wipeScreen(1);
-    } else if (swipeLeft->wasDetected()){
-        wipeScreen(-1);
-    } else {                    //if there was a swipe no other elements should be checked
+//    if (swipeRight->wasDetected()){
+//        wipeScreen(1);
+//    } else if (swipeLeft->wasDetected()){
+//        wipeScreen(-1);
+//    } else {                    //if there was a swipe no other elements should be checked
         checkButtons();
 
         if (screen == 0){
@@ -67,7 +71,7 @@ void SmartClockHmi::update(){
         } else if (screen == 2){
             
         } 
-    }
+//    }
 }
 
 void SmartClockHmi::wipeScreen(int dir){

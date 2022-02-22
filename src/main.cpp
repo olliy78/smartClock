@@ -24,10 +24,10 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   Serial.printf("Hello World!\n");
-  model = new DataModel();
   M5.begin();
   hmi->init();
   hmi->setDataModel(model);
+  hmi->selectScreen(0);
   
   //M5.Buttons.addHandler(wipeScr, E_GESTURE);
   //M5.Buttons.addHandler(toggleColor, E_DBLTAP);
