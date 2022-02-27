@@ -54,45 +54,33 @@ void DataModel::readEEProm(){
 
     if (eep.elements.length == BYTESINEEPROM && (eep.elements.serialnr == eep.elements.shadowSerialnr)){
         debug_println("EEProm valide");
+        eepromValid = true;
     } else {
         debug_println("EEProm invalide --> initialize model");
         initializeModel();
+        eepromValid = false;
     }
+
 }
 
 void DataModel::saveEEProm(){
-    bool eeperror = false;
- 
-    debug_print("writing EEPROM ");
-    debug_print(BYTESINEEPROM);
-    debug_println(" Bytes");
-    eep.elements.length = BYTESINEEPROM;  //store the size inside Data
-
-    for (int i=0; i<BYTESINEEPROM; i++){
-        EEPROM.writeByte(i, eep.bytes[i]);
-        EEPROM.commit();
-        debug_print(".");
-    }
-    //EEPROM.commit();
-    debug_println(" ");
-    debug_print("verifying EEPROM : ");
-    for (uint16_t i=0; i<BYTESINEEPROM; i++){
-        if(eep.bytes[i] != EEPROM.readByte(i)){
-            eeperror = true;
-            debug_print(i);
-            debug_print(" w:");
-            debug_printHex(eep.bytes[i]);
-            debug_print(" r:");
-            debug_printHexln(EEPROM.readByte(i));
+    if (eepromValid == false){
+        debug_print("writing EEPROM ");
+        debug_print(BYTESINEEPROM);
+        debug_print(" Bytes ");
+        eep.elements.length = BYTESINEEPROM;  //store the size inside Data
+        for (uint16_t i=0; i<BYTESINEEPROM; i++){
+            if(eep.bytes[i] != EEPROM.readByte(i)){
+                EEPROM.writeByte(i, eep.bytes[i]);
+                EEPROM.commit();
+                debug_print(".");
+            }
         }
+        debug_println("done");
+        eepromValid = true;
     }
-    if (eeperror)debug_println("error");
-    else debug_println("done");
 }
 
-bool DataModel::isModeValide(int mode, int port){
-    return true;
-}
 
 //crc16 checksum
 #define CRC16 0x8005

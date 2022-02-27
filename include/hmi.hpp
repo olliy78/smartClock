@@ -50,6 +50,7 @@ class MainScreen: public Screen {
     bool AlarmState;
 
     void showClock(int redraw);
+    void showStatus();
     void checkButtons();
 
 public:

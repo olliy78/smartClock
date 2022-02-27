@@ -10,6 +10,9 @@
 #include "mqtt.hpp"
 
 //global objects
+//WiFiClient espClient;
+//PubSubClient client(espClient);
+
 SmartClockHmi *hmi = new SmartClockHmi();       //global HMI Object
 DataModel *model = new DataModel();             //global Data Model
 MqttClient *mqttclnt = new MqttClient();
@@ -54,12 +57,14 @@ void loop() {
   // put your main code here, to run repeatedly:
   
   hmi->update();
+  mqttclnt->update();
   unsigned long currentMs = millis();
-    static unsigned long lastMs = 0;
-    if((currentMs - lastMs > CYCLETIME) || (currentMs < lastMs)){
-        //Serial.println("ping");
-        lastMs = currentMs;
-    }
+  static unsigned long lastMs = 0;
+  if((currentMs - lastMs > 1000) || (currentMs < lastMs)){
+      //Serial.println("ping");
+      lastMs = currentMs;
+      model->saveEEProm();
+  }
   //if (swipeDown.wasDetected()) Serial.println("Swiped down!");
 }
 

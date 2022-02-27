@@ -32,7 +32,8 @@ void MainScreen::setDataModel(DataModel *m){
 //update HMI
 void MainScreen::update(){
     checkButtons();
-    showClock(0);
+    showClock(1);
+    showStatus();
 }
 
 void MainScreen::checkButtons() {
@@ -66,6 +67,20 @@ void MainScreen::drawScreen(bool draw){
         alarmbtn->draw();
     } else {
         alarmbtn->hide();
+    }
+}
+
+void MainScreen::showStatus(){
+    static bool oldstate = true;
+    bool newstate = model->wifiOnline && model->mqttOnline;
+    if (oldstate != newstate){
+        if (newstate){
+            M5.Lcd.fillRect(260,3,60,25, TFT_BLACK);   //Schrift entfernen
+        } else {
+            M5.Lcd.setTextDatum(TL_DATUM);
+            M5.Lcd.drawString("offline!", 265,3);
+        }
+        oldstate = newstate;
     }
 }
 

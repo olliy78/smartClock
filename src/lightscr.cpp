@@ -69,10 +69,10 @@ void LightScreen::checkButtons(){
 void LightScreen::updateData(){
     if (_modelisvalid){
         lightval.white = slider1->getValue();
-        lightval.color = slider2->getValue();
+        lightval.color = slider2->getColor();
         lightval.intense = slider3->getValue();
         model->eep.elements.lightv[model->lightscrnr] = lightval;
-        model->saveEEProm();
+        model->eepromValid = false; //write to EEProm soon
     }
 }
 
@@ -114,7 +114,7 @@ void LightScreen::drawScreen(bool draw){
 
             M5.Lcd.setTextDatum(TL_DATUM);
             M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
-            M5.Lcd.drawString("Weiss", 5, 33);
+            M5.Lcd.drawString("Helligkeit", 5, 33);
             M5.Lcd.drawString("Farbe", 5, 93);
             M5.Lcd.drawString("Intensitaet", 5, 153);
             b_cupboard->draw();

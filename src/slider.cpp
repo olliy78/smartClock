@@ -36,8 +36,10 @@ int SmartSlider::getValue(){
     return _sliderpos;
 }
 
-rgbcolor SmartSlider::getColor(){
-    return _color;
+int SmartSlider::getColor(){
+    int c;
+    c = _sliderpos * 3;
+    return c;
 }
 
 //set the value in range 0 ... 100 if the value changed, the element will redraw

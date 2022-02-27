@@ -67,7 +67,6 @@ void AlarmScreen::checkButtons(){
             changehappend = false;
             _hh = alarmval.hh;
             _mm = alarmval.mm;
-            updateData();
             drawScreen(true);
         }
     }
@@ -78,7 +77,7 @@ void AlarmScreen::updateData(){
         alarmval.hh = _hh;
         alarmval.mm = _mm;
         model->eep.elements.alarmv[model->alscrnr] = alarmval;
-        model->saveEEProm();
+        model->eepromValid = false; //write data too EEProm next time
     }
 }
 

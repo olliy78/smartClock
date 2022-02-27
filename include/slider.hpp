@@ -41,7 +41,7 @@ public:
     void setup(int orientation, int style, int Xpos, int Ypos, int length);
     void update();
     int getValue();
-    rgbcolor getColor();
+    int getColor();
     void setValue(int newval);
     void setVisible(bool visible);
     Zone getZone();
