@@ -8,17 +8,23 @@
 
 #include "main.hpp"
 
- #define BYTESINEEPROM 80        //number ob bytes stored in EEPROM
+#define BYTESINEEPROM 100        //number ob bytes stored in EEPROM
+
+
 
 struct LightValues {
-    uint8_t white, intense;
-    int color;
+    int white, intense, color;
 };
 
 struct AlarmValues {
     uint8_t hh, mm;
     bool day[7];
 };
+
+struct TimeValues {
+    int yyyy, mon, dd, dow, hh, mm, ss;        //dow day of week 0=m 6=s
+};
+
 struct DataElements{
     int length;                             //length of the EEPROM data block
     uint32_t serialnr;                      //serial number value must be the same as the shadowSerialnr
@@ -35,6 +41,9 @@ struct DataElements{
 
 class DataModel {          //data model
     //private
+    //RTC
+    RTC_TimeTypeDef RTCtime;
+    RTC_DateTypeDef RTCDate;
     //helper functions
 
 public:
@@ -59,10 +68,12 @@ public:
     bool eepromValid;
     bool wifiOnline = false;
     bool mqttOnline = false;
+    TimeValues time;
 
 
     DataModel();
     ~DataModel();
+    void update();
     void initializeModel();
     void readEEProm();
     void saveEEProm();

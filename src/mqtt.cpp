@@ -4,6 +4,7 @@
 */
 #include "mqtt.hpp"
 
+
 MqttClient::MqttClient(){
 
 }
@@ -57,6 +58,7 @@ void MqttClient::update(){
     } else if (wifiInfoDisplayed == false){         //display only once after connection
         wifiInfoDisplayed = true;
         model->wifiOnline = true;
+        //model->eepromValid = false;
         Serial.print("WiFi Connected SSID:");
         Serial.println(WiFi.SSID());
         Serial.print("IP Address: ");
@@ -80,6 +82,8 @@ void MqttClient::update(){
                     model->mqttOnline = true;
                     //String stateStr = "stat/"+ MQTT_CLIENT_ID + "/STAT";
                     mqtt_client->publish(MQTT_STAT, "ONLINE");  //Publishes a message to the specified topic
+                    //supscribe to toppics
+                    mqtt_client->subscribe(MQTT_TIME_TOPPIC);
 
                 } else {
                     debug_print("failed, rc=");
@@ -95,6 +99,7 @@ void MqttClient::update(){
             debug_println("MQTT Broker error - trying to reconnect...");
             model->mqttOnline = false;
         }
+        mqtt_client->loop();
         sendData();
     }
 }
@@ -106,25 +111,76 @@ void MqttClient::setDataModel(DataModel *m){
 
 void MqttClient::callback(char* topic, byte* payload, unsigned int length){
     debug_println("MQTT callback");
+    debug_println(topic);
+    String topicString = String(topic);
+    if (topicString.equals(MQTT_TIME_TOPPIC)){
+        String dateTime = String((char*)payload);
+        TimeValues mqttTime;
+        mqttTime.yyyy = dateTime.substring(0,4).toInt();
+        mqttTime.mon = dateTime.substring(5,7).toInt(); 
+        mqttTime.dd = dateTime.substring(8,10).toInt();
+        mqttTime.hh = dateTime.substring(11,13).toInt(); 
+        mqttTime.mm = dateTime.substring(14,16).toInt();
+        mqttTime.ss = dateTime.substring(17,19).toInt(); 
+
+        //model->time = mqttTime;
+        
+        
+        debug_println(dateTime.c_str());
+
+        debug_println(dateTime.substring(0,4).c_str()); //year
+        debug_println(dateTime.substring(5,7).c_str()); //month
+        debug_println(dateTime.substring(8,10).c_str()); //day
+        debug_println(dateTime.substring(11,13).c_str()); //hour
+        debug_println(dateTime.substring(14,16).c_str()); //minute
+        debug_println(dateTime.substring(17,19).c_str()); //second
+
+        
+        
+    }
 }
 
 void MqttClient::sendData(){
-    static DataElements oldData = model->eep.elements;
+    static LightValues oldLight0 = model->eep.elements.lightv[0];
+    static LightValues oldLight1 = model->eep.elements.lightv[1];
     unsigned long currentMs = millis();
     static unsigned long lastMs = 0;
     if ((model->mqttOnline && mqtt_client->connected()) && (currentMs - lastMs > 200) || (currentMs < lastMs)){
         lastMs = currentMs;
-        if (model->eep.elements.lightv[0].white != oldData.lightv[0].white || model->eep.elements.lightv[0].color != oldData.lightv[0].color || model->eep.elements.lightv[0].intense != oldData.lightv[0].intense){
-            debug_println("send MQTT data");
-            String mqtt_val = "";
-            mqtt_val += (int)model->eep.elements.lightv[0].color;
-            mqtt_val += ", ";
-            mqtt_val += (int)model->eep.elements.lightv[0].intense;
-            mqtt_val += ", ";
-            mqtt_val += (int)model->eep.elements.lightv[0].white;
-            debug_println(mqtt_val.c_str());
-            mqtt_client->publish("cmnd/SchrankJonas/HSBColor", mqtt_val.c_str());
-            oldData = model->eep.elements;
+        
+        if (model->eep.elements.lightv[0].white != oldLight0.white || model->eep.elements.lightv[0].color != oldLight0.color || model->eep.elements.lightv[0].intense != oldLight0.intense){
+            debug_println("send MQTT data Light 1");
+            oldLight0 = model->eep.elements.lightv[0];
+            String mqtt_colval = "", mqtt_whval = "";
+            mqtt_colval += oldLight0.color;
+            mqtt_colval += ", ";
+            mqtt_colval += oldLight0.intense;
+            mqtt_colval += ", ";
+            mqtt_colval += oldLight0.white;
+            mqtt_whval += oldLight0.white;
+            debug_println(mqtt_whval.c_str());
+            if (oldLight0.intense > 0){
+                mqtt_client->publish(MQTT_LED1_COLOR, mqtt_colval.c_str());
+            } else {
+                mqtt_client->publish(MQTT_LED1_WHITE, mqtt_whval.c_str());
+            }
+        }
+        if (model->eep.elements.lightv[1].white != oldLight1.white || model->eep.elements.lightv[1].color != oldLight1.color || model->eep.elements.lightv[1].intense != oldLight1.intense){
+            debug_println("send MQTT data Light 1");
+            oldLight1 = model->eep.elements.lightv[1];
+            String mqtt_colval = "", mqtt_whval = "";
+            mqtt_colval += oldLight1.color;
+            mqtt_colval += ", ";
+            mqtt_colval += oldLight1.intense;
+            mqtt_colval += ", ";
+            mqtt_colval += oldLight1.white;
+            mqtt_whval += oldLight1.white;
+            debug_println(mqtt_whval.c_str());
+            if (oldLight1.intense > 0){
+                mqtt_client->publish(MQTT_LED2_COLOR, mqtt_colval.c_str());
+            } else {
+                mqtt_client->publish(MQTT_LED2_WHITE, mqtt_whval.c_str());
+            }
         } 
     }
 }

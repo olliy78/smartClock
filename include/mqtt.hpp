@@ -15,6 +15,7 @@ class MqttClient{
     //private
     PubSubClient *mqtt_client;
     DataModel *model = nullptr;
+    //static DataModel *model;
     bool _modelisvalid = false;
     bool _initialized = false;
     char msg[MSG_BUFFER_SIZE];

@@ -8,7 +8,6 @@
 
 MainScreen::MainScreen(){
     AlarmState = false;
-    _hh = 0, _mm = 0, _ss = 0; 
     targetTime = 0;                    // for next 1 second timeout
 }
 
@@ -31,9 +30,11 @@ void MainScreen::setDataModel(DataModel *m){
 
 //update HMI
 void MainScreen::update(){
-    checkButtons();
-    showClock(1);
-    showStatus();
+    if (_isactive){
+        checkButtons();
+        showClock(false);
+        showStatus(false);
+    }
 }
 
 void MainScreen::checkButtons() {
@@ -61,87 +62,67 @@ void MainScreen::handleDragEvent(int fromX, int fromY, int toX, int toY){
 }
 
 void MainScreen::drawScreen(bool draw){
-     _isactive = draw;
+     _isactive = draw;     
     if (draw){
-        showClock(1);
+        showClock(true);
+        showStatus(true);
         alarmbtn->draw();
     } else {
         alarmbtn->hide();
     }
 }
 
-void MainScreen::showStatus(){
+void MainScreen::showStatus(bool redraw){
     static bool oldstate = true;
     bool newstate = model->wifiOnline && model->mqttOnline;
-    if (oldstate != newstate){
+    if ((oldstate != newstate) || redraw){
         if (newstate){
             M5.Lcd.fillRect(260,3,60,25, TFT_BLACK);   //Schrift entfernen
         } else {
             M5.Lcd.setTextDatum(TL_DATUM);
-            M5.Lcd.drawString("offline!", 265,3);
+            M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
+            M5.Lcd.drawString("offline!", 265,3,2);
         }
         oldstate = newstate;
     }
 }
 
-void MainScreen::showClock(int redraw) {
+void MainScreen::showClock(bool redraw) {
     static int omm = 99, oss = 99;
-    static int xcolon = 0, xsecs = 0;
+
+    //check if model is valid
+    if (!(model->time.hh < 60 && model->time.hh >= 0 && model->time.mm < 60 && model->time.mm >= 0 && model->time.ss < 60 && model->time.ss >=0)){
+        return;
+    }
 
     if (redraw){
         omm = 99;
         oss = 99;
     }
 
-    if (targetTime < millis()) {
+    if (oss != model->time.ss) { // Redraw seconds time every second
+        oss = model->time.ss;
+        int xpos = 250;
+        int ypos = 40;
         M5.Lcd.setTextDatum(TL_DATUM);
-        // Set next update for 1 second later
-        targetTime = millis() + 1000;
-        // Adjust the time values by adding 1 second
-        _ss++;              // Advance second
-        if (_ss == 60) {    // Check for roll-over
-        _ss = 0;          // Reset seconds to zero
-        omm = _mm;        // Save last minute time for display update
-        _mm++;            // Advance minute
-            if (_mm > 59) {   // Check for roll-over
-                _mm = 0;
-                _hh++;          // Advance hour
-                if (_hh > 23) { // Check for 24hr roll-over (could roll-over on 13)
-                _hh = 0;      // 0 for 24 hour clock, set to 1 for 12 hour clock
-                }
-            }
-        }
-        // Update digital time
-        int xpos = 0;
-        int ypos = 10; // Top left corner ot clock text, about half way down
-        int ysecs = ypos + 24;
+        M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
+        xpos += M5.Lcd.drawChar(':', xpos, ypos, 6); // Seconds colon
+        //Draw seconds
+        if (model->time.ss < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 6); // Add leading zero
+        M5.Lcd.drawNumber(model->time.ss, xpos, ypos, 6);                     // Draw seconds
+    }
 
-        if (omm != _mm) { // Redraw hours and minutes time every minute
-            omm = _mm;
-            // Draw hours and minutes
-            M5.Lcd.setTextDatum(TL_DATUM);
-            M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
-            //M5.Lcd.setTextFont(7);
-            //M5.Lcd.setTextSize(2);
-            //M5.Lcd.drawString("12:34:56", xpos, ypos);
-            //M5.Lcd.drawNumber(12, xpos, ypos);
-            if (_hh < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add hours leading zero for 24 hr clock
-            xpos += M5.Lcd.drawNumber(_hh, xpos, ypos, 8);             // Draw hours
-            xcolon = xpos; // Save colon coord for later to flash on/off later
-            xpos += M5.Lcd.drawChar(':', xpos, ypos - 8, 8);
-            if (_mm < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
-            xpos += M5.Lcd.drawNumber(_mm, xpos, ypos, 8);             // Draw minutes
-            xsecs = xpos; // Sae seconds 'x' position for later display updates
-        }
-        if (oss != _ss) { // Redraw seconds time every second
-            oss = _ss;
-            xpos = xsecs;
-            //M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
-            //M5.Lcd.setTextFont(7);
-            xpos += M5.Lcd.drawChar(':', xsecs, ysecs, 6); // Seconds colon
-            //Draw seconds
-            if (_ss < 10) xpos += M5.Lcd.drawChar('0', xpos, ysecs, 6); // Add leading zero
-            M5.Lcd.drawNumber(_ss, xpos, ysecs, 6);                     // Draw seconds
-        }
+    if (omm != model->time.mm) { // Redraw hours and minutes time every minute
+        omm = model->time.mm;
+        int xpos = 0;
+        int ypos = 5;
+        // Draw hours and minutes
+        M5.Lcd.setTextDatum(TL_DATUM);
+        M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
+        if (model->time.hh < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add hours leading zero for 24 hr clock
+        xpos += M5.Lcd.drawNumber(model->time.hh, xpos, ypos, 8);             // Draw hours
+        xpos += M5.Lcd.drawChar(':', xpos, ypos, 8);
+        if (model->time.mm < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
+        xpos += M5.Lcd.drawNumber(model->time.mm, xpos, ypos, 8);             // Draw minutes
     }
 }

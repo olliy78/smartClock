@@ -19,10 +19,37 @@ DataModel::~DataModel(){
 
 }
 
+void DataModel::update(){
+
+    unsigned long currentMs = millis();
+    static unsigned long lastMs = 0;
+    //Update Time < 1 second in model
+    if ((currentMs - lastMs > 1000) || (currentMs < lastMs)){
+        lastMs = currentMs;
+        //update time in model from RTC
+        M5.Rtc.GetTime(&RTCtime);  // Gets the time in the real-time clock.
+        M5.Rtc.GetDate(&RTCDate);
+        time.yyyy = RTCDate.Year;
+        time.mon = RTCDate.Month;
+        time.dd = RTCDate.Date;
+        //time.dow = RTCDate.
+        time.hh = RTCtime.Hours;
+        time.mm = RTCtime.Minutes;
+        time.ss = RTCtime.Seconds;
+        //char timeStrbuff[64];
+        //sprintf(timeStrbuff, "%d/%02d/%02d %02d:%02d:%02d", RTCDate.Year, RTCDate.Month, RTCDate.Date, RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
+        //debug_println(timeStrbuff);
+
+
+    }
+}
+
 void DataModel::initializeModel(){
     Serial.println("initialize Data");
 
     for (int i=0; i<2; i++){
+        eep.elements.serialnr = SERIAL_NR;
+        eep.elements.shadowSerialnr = SERIAL_NR;
         eep.elements.lightv[i].white = 20;
         eep.elements.lightv[i].color = 30;
         eep.elements.lightv[i].intense = 40;
@@ -44,18 +71,24 @@ void DataModel::readEEProm(){
         debug_printHex(EEPROM.readByte(i));
         debug_print(" ");
     }
+    debug_println("");
+    int eepSize = sizeof(eep.elements);
+    if (eepSize != BYTESINEEPROM){
+        debug_print("EEProm Size mismatch!  BYTESINEEPROM = ");
+        debug_print(BYTESINEEPROM);
+        debug_print(" size: ");
+        debug_println(eepSize);
+    }
 
-    debug_print("sizeof(eep.elements): ");
-    debug_println(sizeof(eep.elements));
-    debug_print("eep.elements.serialnr: ");
-    debug_println(eep.elements.serialnr);
-    debug_print("eep.elements.shadowSerialnr: ");
-    debug_println(eep.elements.shadowSerialnr);
-
+    
     if (eep.elements.length == BYTESINEEPROM && (eep.elements.serialnr == eep.elements.shadowSerialnr)){
         debug_println("EEProm valide");
         eepromValid = true;
     } else {
+        debug_print("eep.elements.serialnr: ");
+        debug_println(eep.elements.serialnr);
+        debug_print("eep.elements.shadowSerialnr: ");
+        debug_println(eep.elements.shadowSerialnr);
         debug_println("EEProm invalide --> initialize model");
         initializeModel();
         eepromValid = false;
@@ -89,7 +122,7 @@ uint16_t DataModel::gen_crc16(uint8_t *data, uint16_t size){
     int bits_read = 0, bit_flag;
     /* Sanity check: */
     if(data == NULL) return 0;
-    while(size > 0){
+    while(size > 0){;
         bit_flag = out >> 15;
         /* Get next bit: */
         out <<= 1;

@@ -9,12 +9,7 @@
 #include "slider.hpp"
 #include "model.hpp"
 
-//HMI specific definitions
-#define SLIDERH 40
-#define SLIDERW 50
-#define SLIDER1X 250
-#define SLIDER1Y 10
-#define SLIDER1H 200
+
 
 
 using namespace std;
@@ -45,12 +40,11 @@ class MainScreen: public Screen {
     DataModel *model = nullptr;
     bool _modelisvalid = false;
     Button *alarmbtn;
-    uint8_t _hh, _mm, _ss; 
     uint32_t targetTime;                    // for next 1 second timeout
     bool AlarmState;
 
-    void showClock(int redraw);
-    void showStatus();
+    void showClock(bool redraw);
+    void showStatus(bool redraw);
     void checkButtons();
 
 public:
