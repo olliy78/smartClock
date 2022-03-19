@@ -20,6 +20,8 @@
 SmartClockHmi *hmi;       //global HMI Object
 DataModel *myModel;             //global Data Model
 MqttClient *mqttclnt;
+WiFiClient espClient;
+PubSubClient *mqtt_client;
 
 void buttonDragged(Event& e) {
   hmi->handleDragEvent(e.from.x, e.from.y, e.to.x, e.to.y);
@@ -29,19 +31,26 @@ void buttonPressed(Event& e) {
   hmi->handlePressEvent(e.to.x, e.to.y);
 }
 
+void mqttCallback(char* topic, byte* payload, unsigned int length){
+  mqttclnt->callback(topic, payload, length);
+}
+
 void setup() {
   hmi = new SmartClockHmi();       //global HMI Object
   myModel = new DataModel();             //global Data Model
   mqttclnt = new MqttClient();
+  mqtt_client = new PubSubClient(espClient);
 
   // put your setup code here, to run once:
   Serial.begin(115200);
   debug_println("Hello World!");
   M5.begin();
-  if (!EEPROM.begin(BYTESINEEPROM)){  //Request storage of SIZE size(success return 1).  申请SIZE大小的存储(成功返回1)
-    debug_println("\nFailed to initialise EEPROM!"); //串口输出格式化字符串.  Serial output format string
+  if (!EEPROM.begin(BYTESINEEPROM)){  //Request storage of SIZE size(success return 1). 
+    debug_println("\nFailed to initialise EEPROM!"); //Serial output format string
     delay(1000000);
   }
+  DateTime.begin();
+  
   hmi->init();
   myModel->readEEProm();
   hmi->setDataModel(myModel);
@@ -55,8 +64,11 @@ void setup() {
   M5.Buttons.addHandler(buttonDragged, E_MOVE + E_DRAGGED);
   //swipeDown.addHandler(wipeScr, E_GESTURE);
 
+  mqttclnt->setMQTTClient(mqtt_client);
   mqttclnt->setDataModel(myModel);
   mqttclnt->init();
+
+  mqtt_client->setCallback(&mqttCallback); //Sets the message callback function
 
   
 }

@@ -13,13 +13,24 @@ MqttClient::~MqttClient(){
 
 }
 
+void MqttClient::setDataModel(DataModel *m){
+    model = m;
+    _modelisvalid = true;
+}
+
+void MqttClient::setMQTTClient(PubSubClient *c){
+    mqtt_client = c;
+    mqtt = new PubSubClientTools(*mqtt_client);
+
+}
+
 void MqttClient::init(){
     if (_modelisvalid){
 
         WiFi.begin(model->eep.elements.wifissid, model->eep.elements.wifipsk);
         
-        mqtt_client = new PubSubClient(espClient);
-        mqtt = new PubSubClientTools(*mqtt_client);
+        //mqtt_client = new PubSubClient(espClient);
+        //mqtt = new PubSubClientTools(*mqtt_client);
         
         _initialized = true;
     }
@@ -70,7 +81,7 @@ void MqttClient::update(){
         //client = new PubSubClient(espClient);
         
         mqtt_client->setServer(MQTT_SERVER, 1883);  //Sets the server details
-        mqtt_client->setCallback(&MqttClient::callback); //Sets the message callback function
+        //mqtt_client->setCallback(&MqttClient::callback); //Sets the message callback function
         if (!mqtt_client->connected()){
             unsigned long currentMs = millis();
             static unsigned long lastMs = 0;
@@ -104,10 +115,6 @@ void MqttClient::update(){
     }
 }
 
-void MqttClient::setDataModel(DataModel *m){
-    model = m;
-    _modelisvalid = true;
-}
 
 void MqttClient::callback(char* topic, byte* payload, unsigned int length){
     debug_println("MQTT callback");
@@ -115,28 +122,18 @@ void MqttClient::callback(char* topic, byte* payload, unsigned int length){
     String topicString = String(topic);
     if (topicString.equals(MQTT_TIME_TOPPIC)){
         String dateTime = String((char*)payload);
-        TimeValues mqttTime;
-        mqttTime.yyyy = dateTime.substring(0,4).toInt();
-        mqttTime.mon = dateTime.substring(5,7).toInt(); 
-        mqttTime.dd = dateTime.substring(8,10).toInt();
-        mqttTime.hh = dateTime.substring(11,13).toInt(); 
-        mqttTime.mm = dateTime.substring(14,16).toInt();
-        mqttTime.ss = dateTime.substring(17,19).toInt(); 
+        //DateFormatter::ISO8601
+        struct tm timeinfo;
+        timeinfo.tm_year = dateTime.substring(0,4).toInt() - 1900;
+        timeinfo.tm_mon = dateTime.substring(5,7).toInt() -1;
+        timeinfo.tm_mday = dateTime.substring(8,10).toInt();
+        timeinfo.tm_hour = dateTime.substring(11,13).toInt();
+        timeinfo.tm_min = dateTime.substring(14,16).toInt();
+        timeinfo.tm_sec = dateTime.substring(17,19).toInt();
+        
+        time_t time = mktime(&timeinfo);
 
-        //model->time = mqttTime;
-        
-        
-        debug_println(dateTime.c_str());
-
-        debug_println(dateTime.substring(0,4).c_str()); //year
-        debug_println(dateTime.substring(5,7).c_str()); //month
-        debug_println(dateTime.substring(8,10).c_str()); //day
-        debug_println(dateTime.substring(11,13).c_str()); //hour
-        debug_println(dateTime.substring(14,16).c_str()); //minute
-        debug_println(dateTime.substring(17,19).c_str()); //second
-
-        
-        
+        model->setRTC(time);
     }
 }
 

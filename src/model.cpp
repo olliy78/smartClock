@@ -154,3 +154,19 @@ uint16_t DataModel::gen_crc16(uint8_t *data, uint16_t size){
     return crc;
 
 }
+
+void DataModel::setRTC(time_t time){
+
+    debug_println(asctime(gmtime(&time)));
+
+    RTCDate.Year=gmtime(&time)->tm_year + 1900;
+    RTCDate.Month=gmtime(&time)->tm_mon + 1;
+    RTCDate.Date=gmtime(&time)->tm_mday;
+    RTCtime.Hours=gmtime(&time)->tm_hour;
+    RTCtime.Minutes=gmtime(&time)->tm_min;
+    RTCtime.Seconds=gmtime(&time)->tm_sec;
+
+    M5.Rtc.SetTime(&RTCtime);
+    M5.Rtc.SetDate(&RTCDate);
+        
+}

@@ -19,10 +19,10 @@ class MqttClient{
     bool _modelisvalid = false;
     bool _initialized = false;
     char msg[MSG_BUFFER_SIZE];
-    WiFiClient espClient;
+    //WiFiClient espClient;
     PubSubClientTools *mqtt;
 
-    static void callback(char* topic, byte* payload, unsigned int length);
+    
 
     
 public:
@@ -31,5 +31,7 @@ public:
     void init();
     void update();
     void setDataModel(DataModel *m);
+    void setMQTTClient(PubSubClient *c);
     void sendData();
+    void callback(char* topic, byte* payload, unsigned int length);
 };

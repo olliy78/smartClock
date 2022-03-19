@@ -39,6 +39,7 @@ struct DataElements{
     uint32_t shadowSerialnr;
 };
 
+
 class DataModel {          //data model
     //private
     //RTC
@@ -77,5 +78,6 @@ public:
     void initializeModel();
     void readEEProm();
     void saveEEProm();
+    void setRTC(time_t time);
     uint16_t gen_crc16(uint8_t *data, uint16_t size);
 };
