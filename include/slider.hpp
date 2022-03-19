@@ -43,6 +43,7 @@ public:
     int getValue();
     int getColor();
     void setValue(int newval);
+    void setColor(int newval);
     void setVisible(bool visible);
     Zone getZone();
     void handleDragEvent(int fromX, int fromY, int toX, int toY);

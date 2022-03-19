@@ -41,6 +41,25 @@ void LightScreen::update(){
     slider1->update();
     slider2->update();
     slider3->update();
+    // check if the light values in the model changed
+    static int oldWhite[2] = {0,0};
+    static int oldIntense[2] = {0,0};
+    static int oldColor[2] = {0,0};
+    if (oldWhite[model->lightscrnr] != model->eep.elements.lightv[model->lightscrnr].white){
+        //debug_println("value White chaged in model");
+        slider1->setValue(model->eep.elements.lightv[model->lightscrnr].white);
+        oldWhite[model->lightscrnr] = model->eep.elements.lightv[model->lightscrnr].white; 
+    }
+    if (oldColor[model->lightscrnr] != model->eep.elements.lightv[model->lightscrnr].color){
+        //debug_println("value White chaged in model");
+        slider2->setColor(model->eep.elements.lightv[model->lightscrnr].color);
+        oldColor[model->lightscrnr] = model->eep.elements.lightv[model->lightscrnr].color; 
+    }
+    if (oldIntense[model->lightscrnr] != model->eep.elements.lightv[model->lightscrnr].intense){
+        //debug_println("value Intense chaged in model");
+        slider3->setValue(model->eep.elements.lightv[model->lightscrnr].intense);
+        oldIntense[model->lightscrnr] = model->eep.elements.lightv[model->lightscrnr].intense; 
+    }
 }
 
 void LightScreen::checkButtons(){

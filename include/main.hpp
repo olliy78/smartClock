@@ -13,6 +13,7 @@
 #include <PubSubClientTools.h>
 #include <ESPDateTime.h>
 #include <time.h>
+#include <ArduinoJson.h>
 
 
 
@@ -22,6 +23,8 @@
 
 #define MQTT_SERVER "192.168.0.222"
 #define MQTT_TIME_TOPPIC "stat/DateTime/RESULT"
+#define MQTT_LED1_STATE "stat/DeckeGZ/RESULT"
+#define MQTT_LED2_STATE "stat/SchrankGZ/RESULT"
 
 #ifdef ROOM_1
     #define MQTT_LED1_COLOR "cmnd/DeckeFine/HSBColor"

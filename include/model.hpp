@@ -69,6 +69,7 @@ public:
     bool eepromValid;
     bool wifiOnline = false;
     bool mqttOnline = false;
+    unsigned long lastSendTime = 0;
     TimeValues time;
 
 

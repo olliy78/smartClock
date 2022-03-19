@@ -38,8 +38,12 @@ int SmartSlider::getValue(){
 
 int SmartSlider::getColor(){
     int c;
-    c = _sliderpos * 3;
+    c = _sliderpos * 3.6;
     return c;
+}
+
+void SmartSlider::setColor(int newval){
+    setValue((int)(newval/3.6));
 }
 
 //set the value in range 0 ... 100 if the value changed, the element will redraw
@@ -139,7 +143,7 @@ void SmartSlider::draw(){
             //M5.Lcd.drawRect(_Xpos, _Ypos, _length, SL_WIDTH, RED);
             if (_style == SL_SIMPLE){
                 int fillend = _sliderpos * (_length - 2*SL_RADIUS) * 0.01 + SL_RADIUS;      //How far it is filled
-                M5.Lcd.fillRoundRect(fillend + _Xpos, _Ypos + 12, _length, 16, 4, BLACK);
+                M5.Lcd.fillRoundRect(fillend + _Xpos, _Ypos + 13, _length - fillend -1, 14, 4, BLACK);
                 M5.Lcd.fillRoundRect(_Xpos, _Ypos + 12, fillend + _Xpos, 16, 4, SL_COLOR);
                 M5.Lcd.drawRoundRect(_Xpos, _Ypos + 12, _length, 16, 4, SL_COLOR);
                 M5.Lcd.fillCircle(fillend + _Xpos, _Ypos+20, SL_RADIUS, SL_COLOR);

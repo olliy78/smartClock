@@ -21,6 +21,10 @@ class MqttClient{
     char msg[MSG_BUFFER_SIZE];
     //WiFiClient espClient;
     PubSubClientTools *mqtt;
+    //JsonDoc //size calcolated with https://arduinojson.org/v6/assistant/
+    StaticJsonDocument<400> jsonDoc;
+
+    LightValues hsbStrToLightval(const char* hsbStr);
 
     
 
@@ -33,5 +37,6 @@ public:
     void setDataModel(DataModel *m);
     void setMQTTClient(PubSubClient *c);
     void sendData();
+    void mqttSubsribe();
     void callback(char* topic, byte* payload, unsigned int length);
 };
