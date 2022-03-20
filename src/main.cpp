@@ -70,6 +70,7 @@ void setup() {
 
   mqtt_client->setCallback(&mqttCallback); //Sets the message callback function
 
+  M5.Axp.SetLed(0);
   
 }
 
@@ -85,7 +86,11 @@ void loop() {
       //Serial.println("ping");
       lastMs = currentMs;
       myModel->saveEEProm();
+      //debug_println(M5.Axp.GetBatteryLevel());
   }
   //if (swipeDown.wasDetected()) Serial.println("Swiped down!");
+
+  //M5.Axp.DeepSleep(5000000);
+  //M5.Axp.GetBatPower()
 }
 

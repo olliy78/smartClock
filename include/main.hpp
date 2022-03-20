@@ -17,9 +17,9 @@
 
 
 
-//#define ROOM_1      //Fine
+#define ROOM_1      //Fine
 //#define ROOM_2      //Jonas
-#define ROOM_3      //Gaestezimmer
+//#define ROOM_3      //Gaestezimmer
 
 #define MQTT_SERVER "192.168.0.222"
 #define MQTT_TIME_TOPPIC "stat/DateTime/RESULT"

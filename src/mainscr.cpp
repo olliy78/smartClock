@@ -78,12 +78,37 @@ void MainScreen::showStatus(bool redraw){
     if ((oldstate != newstate) || redraw){
         if (newstate){
             M5.Lcd.fillRect(260,3,60,25, TFT_BLACK);   //Schrift entfernen
+            redraw = true;
         } else {
             M5.Lcd.setTextDatum(TL_DATUM);
             M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
             M5.Lcd.drawString("offline!", 265,3,2);
         }
         oldstate = newstate;
+    }
+    //print accu level if not offline
+    static int oldAccu = 0;
+    int newAccu = (int)M5.Axp.GetBatteryLevel();
+    if ((oldAccu != newAccu) || redraw){
+        oldAccu = newAccu;
+        if (newstate){
+            M5.Lcd.fillRect(260,3,40,25, TFT_BLACK);   //Schrift entfernen
+            M5.Lcd.drawNumber(newAccu, 265,3,2);
+            M5.Lcd.drawString("%", 291,3,2);
+            redraw = true;
+        }
+    }
+    //print if accu is charging
+    static bool oldCharge = false;
+    bool newCharge = M5.Axp.isCharging();
+    if ((oldCharge != newCharge) || redraw){
+        oldCharge = newCharge;
+        if (newstate){
+            M5.Lcd.fillRect(300,3,20,25, TFT_BLACK);   //Schrift entfernen
+            if (newCharge) M5.Lcd.drawString("+", 302,3,2);
+            else M5.Lcd.drawString("-", 302,3,2);
+            redraw = true;
+        }
     }
 }
 

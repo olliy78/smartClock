@@ -78,7 +78,7 @@ void LightScreen::checkButtons(){
         if (changehappend){
             changehappend = false;
             slider1->setValue(lightval.white);
-            slider2->setValue(lightval.color);
+            slider2->setColor(lightval.color);
             slider3->setValue(lightval.intense);
             drawScreen(true);
         }

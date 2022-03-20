@@ -44,6 +44,7 @@ int SmartSlider::getColor(){
 
 void SmartSlider::setColor(int newval){
     setValue((int)(newval/3.6));
+    updateRGB();
 }
 
 //set the value in range 0 ... 100 if the value changed, the element will redraw
@@ -148,32 +149,32 @@ void SmartSlider::draw(){
                 M5.Lcd.drawRoundRect(_Xpos, _Ypos + 12, _length, 16, 4, SL_COLOR);
                 M5.Lcd.fillCircle(fillend + _Xpos, _Ypos+20, SL_RADIUS, SL_COLOR);
             } else if (_style == SL_COLORPICKER){
-                int seglen = (_length - 4) * 0.25;             // 
+                int seglen = (_length - 4) * 0.25;             // deviding into 4 segments
                 int curpos = 0;
                 double colScale = 255.0 / seglen;
                 uint8_t r=0, g=0, b=0;
                 for ( int segm = 0; segm < 4; segm++){
                     for (int x = 0; x < seglen; x++){
                         if (segm == 0){
-                            r = 255 - (x * colScale);
-                            g = 0;
-                            b = x * colScale;
-                        } else if (segm == 1){
-                            r = 0;
+                            r = 255;
                             g = x * colScale;
-                            b = 255 - (x * colScale);
-                        } else if (segm == 2){
-                            r = x * colScale;
+                            b = 0;
+                        } else if (segm == 1){
+                            r = 255 - (x * colScale);
                             g = 255;
                             b = 0;
-                        } else if (segm == 3){
-                            r = 255;
+                        } else if (segm == 2){
+                            r = 0;
                             g = 255 - (x * colScale);
-                            b = 0;
-                        } 
+                            b = x * colScale;
+                        } else if (segm == 3){
+                            r = x * colScale;
+                            g = 0;
+                            b = 255 - (x * colScale);
+                        }                      
                         uint16_t color = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
                         curpos = _Xpos + (segm*seglen) + x + 1;
-                        M5.Lcd.drawFastVLine(curpos, _Ypos + 12, 16, color);
+                        M5.Lcd.drawFastVLine(curpos, _Ypos + 13, 14, color);
                     }
                 }
                 int pos = _sliderpos * (_length - 2*SL_RADIUS) * 0.01 + SL_RADIUS;      // slider position on screen
@@ -199,21 +200,21 @@ void SmartSlider::draw(){
 }
 
 void SmartSlider::updateRGB(){
-    if (_sliderpos >=0 && _sliderpos< 25){
-        _color.r = 255 - (_sliderpos * 10.24);
-        _color.g = 0;
-        _color.b = _sliderpos * 10.24;
+    if (_sliderpos< 25){
+        _color.r = 255;
+        _color.g = (_sliderpos - 25) * 10.23;
+        _color.b = 0;
     } else if (_sliderpos >=25 && _sliderpos < 50){
-        _color.r = 0;
-        _color.g = (_sliderpos - 25) * 10.24;
-        _color.b = 255 - ((_sliderpos-25) * 10.24);
-    } else if (_sliderpos >=50 && _sliderpos < 75){
-        _color.r = (_sliderpos - 50) * 10.24;
+        _color.r = 255 - (_sliderpos * 10.23);
         _color.g = 255;
         _color.b = 0;
-    } else if (_sliderpos >=75 && _sliderpos <= 100){
-        _color.r = 255;
-        _color.g = 255 - ((_sliderpos-75) * 10.2);
-        _color.b = 0;
+    } else if (_sliderpos >=50 && _sliderpos < 75){
+        _color.r = 0;
+        _color.g = 255 - ((_sliderpos-25) * 10.23);
+        _color.b = (_sliderpos - 25) * 10.23;
+    } else if (_sliderpos >=75){
+        _color.r = _sliderpos * 10.23;
+        _color.g = 0;
+        _color.b = 255 - (_sliderpos * 10.23);
     }
 }
