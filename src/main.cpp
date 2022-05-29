@@ -8,6 +8,7 @@
 #include "hmi.hpp"
 #include "model.hpp"
 #include "mqtt.hpp"
+#include "alarm.hpp"
 
 
 //global objects
@@ -22,6 +23,7 @@ DataModel *myModel;             //global Data Model
 MqttClient *mqttclnt;
 WiFiClient espClient;
 PubSubClient *mqtt_client;
+AlarmClock *alarmclk;
 
 void buttonDragged(Event& e) {
   hmi->handleDragEvent(e.from.x, e.from.y, e.to.x, e.to.y);
@@ -36,10 +38,13 @@ void mqttCallback(char* topic, byte* payload, unsigned int length){
 }
 
 void setup() {
+  
+  
   hmi = new SmartClockHmi();       //global HMI Object
   myModel = new DataModel();             //global Data Model
   mqttclnt = new MqttClient();
   mqtt_client = new PubSubClient(espClient);
+  alarmclk = new AlarmClock();
 
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -50,10 +55,17 @@ void setup() {
     delay(1000000);
   }
   DateTime.begin();
+
+  M5.Axp.SetLed(0);     //switch off the internal green LED
+  M5.Axp.SetSpkEnable(1);
+  
+  alarmclk->setDataModel(myModel);
+  alarmclk->init();
   
   hmi->init();
   myModel->readEEProm();
   hmi->setDataModel(myModel);
+  hmi->setAlarmClock(alarmclk);
   hmi->selectScreen(0);
   
   //M5.Buttons.addHandler(wipeScr, E_GESTURE);
@@ -67,10 +79,9 @@ void setup() {
   mqttclnt->setMQTTClient(mqtt_client);
   mqttclnt->setDataModel(myModel);
   mqttclnt->init();
-
   mqtt_client->setCallback(&mqttCallback); //Sets the message callback function
 
-  M5.Axp.SetLed(0);
+  
   
 }
 
@@ -80,6 +91,8 @@ void loop() {
   hmi->update();
   mqttclnt->update();
   myModel->update();
+  alarmclk->update();
+
   unsigned long currentMs = millis();
   static unsigned long lastMs = 0;
   if((currentMs - lastMs > 1000) || (currentMs < lastMs)){
@@ -92,5 +105,6 @@ void loop() {
 
   //M5.Axp.DeepSleep(5000000);
   //M5.Axp.GetBatPower()
+  
 }
 

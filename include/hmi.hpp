@@ -8,6 +8,7 @@
 #include "main.hpp"
 #include "slider.hpp"
 #include "model.hpp"
+#include "alarm.hpp"
 
 
 
@@ -38,6 +39,7 @@ class Screen {
 class MainScreen: public Screen {
 
     DataModel *model = nullptr;
+    AlarmClock *alarmclk = nullptr;
     bool _modelisvalid = false;
     Button *alarmbtn;
     uint32_t targetTime;                    // for next 1 second timeout
@@ -52,6 +54,7 @@ public:
     ~MainScreen();
     void init();
     void setDataModel(DataModel *m);
+    void setAlarmClock(AlarmClock *c);
     void update();
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
@@ -63,6 +66,7 @@ public:
 class AlarmScreen: public Screen {
 
     DataModel *model = nullptr;
+    AlarmClock *alarmclk = nullptr;
     bool _modelisvalid = false;
     int _hh, _mm;
     bool _isactive;
@@ -79,6 +83,7 @@ class AlarmScreen: public Screen {
     ~AlarmScreen();
     void init();
     void setDataModel(DataModel *m);
+    void setAlarmClock(AlarmClock *c);
     void update();
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
@@ -163,6 +168,7 @@ public:
     ~SmartClockHmi();
     void init();
     void setDataModel(DataModel *m);
+    void setAlarmClock(AlarmClock *c);
     void update();
     void wipeScreen(int dir);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);

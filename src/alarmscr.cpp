@@ -36,7 +36,10 @@ void AlarmScreen::setDataModel(DataModel *m){
     alarmval = model->eep.elements.alarmv[model->alscrnr];//get data from model
     _hh = alarmval.hh;
     _mm = alarmval.mm;
+}
 
+void AlarmScreen::setAlarmClock(AlarmClock *c){
+    alarmclk = c;
 }
 
 void AlarmScreen::update(){

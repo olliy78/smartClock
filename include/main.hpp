@@ -17,20 +17,21 @@
 
 
 
-#define ROOM_1      //Fine
+//#define ROOM_1      //Fine
 //#define ROOM_2      //Jonas
-//#define ROOM_3      //Gaestezimmer
+#define ROOM_3      //Gaestezimmer
 
 #define MQTT_SERVER "192.168.0.222"
 #define MQTT_TIME_TOPPIC "stat/DateTime/RESULT"
-#define MQTT_LED1_STATE "stat/DeckeGZ/RESULT"
-#define MQTT_LED2_STATE "stat/SchrankGZ/RESULT"
+
 
 #ifdef ROOM_1
     #define MQTT_LED1_COLOR "cmnd/DeckeFine/HSBColor"
     #define MQTT_LED1_WHITE "cmnd/DeckeFine/White"
     #define MQTT_LED2_COLOR "cmnd/SchrankFine/HSBColor"
     #define MQTT_LED2_WHITE "cmnd/SchrankFine/White"
+    #define MQTT_LED1_STATE "stat/DeckeFine/RESULT"
+    #define MQTT_LED2_STATE "stat/SchrankFine/RESULT"
     #define MQTT_CLIENT_ID "M5Clock_Fine"
     #define MQTT_STAT "stat/M5Clock_Fine/STAT"
     #define SERIAL_NR 123001
@@ -40,6 +41,8 @@
     #define MQTT_LED1_WHITE "cmnd/DeckeJonas/White"
     #define MQTT_LED2_COLOR "cmnd/SchrankJonas/HSBColor"
     #define MQTT_LED2_WHITE "cmnd/SchrankJonas/White"
+    #define MQTT_LED1_STATE "stat/DeckeJonas/RESULT"
+    #define MQTT_LED2_STATE "stat/SchrankJonas/RESULT"
     #define MQTT_CLIENT_ID "M5Clock_Jonas"
     #define MQTT_STAT "stat/M5Clock_Jonas/STAT"
     #define SERIAL_NR 123002
@@ -49,6 +52,8 @@
     #define MQTT_LED1_WHITE "cmnd/DeckeGZ/White"
     #define MQTT_LED2_COLOR "cmnd/SchrankGZ/HSBColor"
     #define MQTT_LED2_WHITE "cmnd/SchrankGZ/White"
+    #define MQTT_LED1_STATE "stat/DeckeGZ/RESULT"
+    #define MQTT_LED2_STATE "stat/SchrankGZ/RESULT"
     #define MQTT_CLIENT_ID "M5Clock_GZ"
     #define MQTT_STAT "stat/M5Clock_GZ/STAT"
     #define SERIAL_NR 123003

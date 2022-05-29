@@ -45,6 +45,11 @@ void SmartClockHmi::setDataModel(DataModel *m){
     szenescr->setDataModel(m);
 }
 
+void SmartClockHmi::setAlarmClock(AlarmClock *c){
+    mainscr->setAlarmClock(c);
+    alarmscr->setAlarmClock(c);
+}
+
 void SmartClockHmi::selectScreen(int s){
     screen = s;
     drawScreen();

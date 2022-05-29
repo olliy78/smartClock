@@ -28,6 +28,10 @@ void MainScreen::setDataModel(DataModel *m){
     model = m;
 }
 
+void MainScreen::setAlarmClock(AlarmClock *c){
+    alarmclk = c;
+}
+
 //update HMI
 void MainScreen::update(){
     if (_isactive){
@@ -40,14 +44,15 @@ void MainScreen::update(){
 void MainScreen::checkButtons() {
     if (_isactive){
         if (alarmbtn->wasPressed()){
-            //Serial.println("Alarm");
             AlarmState = !AlarmState;
             if (AlarmState){
                 alarmbtn->setLabel("Alarm ON");
                 alarmbtn->off.bg = RED;
+                alarmclk->alarmTone(true);
             } else {
                 alarmbtn->setLabel("Alarm OFF");
                 alarmbtn->off.bg = BLACK;
+                alarmclk->alarmTone(false);
             }
         }
     }
