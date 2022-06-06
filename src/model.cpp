@@ -32,7 +32,7 @@ void DataModel::update(){
         time.yyyy = RTCDate.Year;
         time.mon = RTCDate.Month;
         time.dd = RTCDate.Date;
-        //time.dow = RTCDate.
+        time.dow = RTCDate.WeekDay;
         time.hh = RTCtime.Hours;
         time.mm = RTCtime.Minutes;
         time.ss = RTCtime.Seconds;

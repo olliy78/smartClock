@@ -33,6 +33,14 @@ void buttonPressed(Event& e) {
   hmi->handlePressEvent(e.to.x, e.to.y);
 }
 
+void buttonPressing(Event& e) {
+  hmi->handlePressingEvent(e.to.x, e.to.y, e.duration);
+}
+
+void buttonReleasing(Event& e) {
+  hmi->handleReleasingEvent(e.to.x, e.to.y);
+}
+
 void mqttCallback(char* topic, byte* payload, unsigned int length){
   mqttclnt->callback(topic, payload, length);
 }
@@ -73,6 +81,8 @@ void setup() {
   //M5.Buttons.addHandler(buttonDragged, E_DRAGGED);
   //M5.Buttons.addHandler(buttonPressed, E_TOUCH + E_RELEASE);
   M5.Buttons.addHandler(buttonPressed, E_TOUCH);
+  M5.Buttons.addHandler(buttonPressing, E_PRESSING);
+  M5.Buttons.addHandler(buttonReleasing, E_RELEASE);
   M5.Buttons.addHandler(buttonDragged, E_MOVE + E_DRAGGED);
   //swipeDown.addHandler(wipeScr, E_GESTURE);
 

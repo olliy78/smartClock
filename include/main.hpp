@@ -63,6 +63,7 @@
 #define CYCLETIME 200               //cycle time for basic scheduler in ms default 10ms
 #define MIN_SCREEN -2
 #define MAX_SCREEN 2
+#define LONGPRESS 5                 //seconds to press the alarm button to switch the alarm off
 
 
 

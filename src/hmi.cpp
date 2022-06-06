@@ -118,6 +118,15 @@ void SmartClockHmi::handleDragEvent(int fromX, int fromY, int toX, int toY){
     szenescr->handleDragEvent(fromX, fromY, toX, toY);
 }
 
+void SmartClockHmi::handlePressingEvent(int x, int y, int duration){
+    mainscr->handlePressingEvent(x, y, duration);
+}
+
+void SmartClockHmi::handleReleasingEvent(int x, int y){
+    mainscr->handleReleasingEvent(x, y);
+}
+    
+
 void SmartClockHmi::drawScreen(){
     //deactivate screens
     mainscr->drawScreen(false);

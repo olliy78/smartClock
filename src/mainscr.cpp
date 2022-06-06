@@ -21,7 +21,6 @@ void MainScreen::init(){
     //buttons
     ButtonColors on_clrs = {TFT_YELLOW, TFT_BLACK, TFT_BLACK};
     ButtonColors off_clrs = {TFT_BLACK, TFT_YELLOW, TFT_YELLOW};
-    alarmbtn = new Button(0, 120, 320, 100, false ,"Alarm OFF", off_clrs, on_clrs, CC_DATUM, 0, 0, 2);
 }
 
 void MainScreen::setDataModel(DataModel *m){
@@ -35,46 +34,73 @@ void MainScreen::setAlarmClock(AlarmClock *c){
 //update HMI
 void MainScreen::update(){
     if (_isactive){
-        checkButtons();
-        showClock(false);
-        showStatus(false);
-    }
-}
-
-void MainScreen::checkButtons() {
-    if (_isactive){
-        if (alarmbtn->wasPressed()){
-            AlarmState = !AlarmState;
-            if (AlarmState){
-                alarmbtn->setLabel("Alarm ON");
-                alarmbtn->off.bg = RED;
-                alarmclk->alarmTone(true);
-            } else {
-                alarmbtn->setLabel("Alarm OFF");
-                alarmbtn->off.bg = BLACK;
-                alarmclk->alarmTone(false);
+        unsigned long currentMs = millis();
+        static unsigned long lastMs = 0;
+        //Update Time < 1 second in model
+        if ((currentMs - lastMs > 500) || (currentMs < lastMs)){
+            lastMs = currentMs;
+            _buttonIsPressedSince = (currentMs - _buttonPressMs);
+            if (_buttonIsPressedSince > 10000 || _buttonIsPressedSince < 0) {
+                _buttonIsPressedSince = 0;
+                _buttonIsPressed = false;
             }
+            checkButtons();
+            showClock(false);
+            showStatus(false);
+            showAlarm(false);
         }
     }
 }
 
-void MainScreen::handlePressEvent(int x, int y){
-    
+void MainScreen::checkButtons() {
+
+}
+
+void MainScreen::handlePressEvent(int x, int y){    
+    if (_isactive){
+        if (y>= 120 && y<=220){
+            if (alarmclk->isAlarmActive()){
+                alarmclk->triggerSnooze();
+            }
+        }
+    }    
 }
 
 void MainScreen::handleDragEvent(int fromX, int fromY, int toX, int toY){    
     
 }
 
+void MainScreen::handlePressingEvent(int x, int y, int duration){
+    if (_isactive){                     //only if screen is active
+        if (y>= 120 && y<=220){         //inside the button
+            _buttonPressMs = millis();  // get the timestamp
+            _buttonIsPressed = true;
+            _buttonIsPressedSince = 0;
+        }
+    }
+}
+
+void MainScreen::handleReleasingEvent(int x, int y){
+    if (_isactive){                     //only if screen is active
+        if (y>= 120 && y<=220){         //inside the button
+            if (_buttonIsPressedSince > (LONGPRESS * 1000)){     //pressed min. for definite Time
+                if (alarmclk->isSnooze() || alarmclk->isAlarmActive()){         //if alarm or snooze is active
+                    alarmclk->stopAlarm();          //stop is
+                }
+            }
+            _buttonIsPressedSince = 0;
+            _buttonIsPressed = false;
+        }
+    }
+}
+
 void MainScreen::drawScreen(bool draw){
-     _isactive = draw;     
+    _isactive = draw;     
     if (draw){
         showClock(true);
         showStatus(true);
-        alarmbtn->draw();
-    } else {
-        alarmbtn->hide();
-    }
+        showAlarm(true);
+    } 
 }
 
 void MainScreen::showStatus(bool redraw){
@@ -156,3 +182,45 @@ void MainScreen::showClock(bool redraw) {
         xpos += M5.Lcd.drawNumber(model->time.mm, xpos, ypos, 8);             // Draw minutes
     }
 }
+
+void MainScreen::showAlarm(bool redraw) {
+    
+    if (alarmclk->isAlarmActive()){
+        static bool red = false;
+        red = !red;
+        if (red){
+            M5.Lcd.fillRect(0, 120, 320, 100, TFT_RED);
+            M5.Lcd.setTextColor(TFT_YELLOW, TFT_RED);    
+        } else {
+            M5.Lcd.fillRect(0, 120, 320, 100, TFT_BLACK);
+            M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);
+        }
+    } else {
+        M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);
+    }
+    
+    M5.Lcd.drawRect(0, 120, 320, 100, TFT_YELLOW);
+    if (_buttonIsPressed){                                              //long press on the button is running
+        int countDown = LONGPRESS - (_buttonIsPressedSince/1000);       //count down until alarm will be deaktivated
+        if (countDown < 0) countDown = 0;
+        M5.Lcd.setTextDatum(TC_DATUM);
+        M5.Lcd.drawNumber(countDown, 170,132,8);                        //print the count down
+    } else {
+        if (alarmclk->isAlarmSet()){                                    //is there any alarm set
+            M5.Lcd.setTextDatum(TR_DATUM);
+            M5.Lcd.drawString("Alarm in: ", 170,135,4);                 //give the time left
+            long secToAlarm = alarmclk->getAlarmInSec();
+            char timeStrBuff[64] = "";
+            sprintf(timeStrBuff, " %02d:%02d", (int)secToAlarm/3600, (int)(secToAlarm%3600)/60);
+            M5.Lcd.setTextDatum(TL_DATUM);
+            M5.Lcd.drawString(timeStrBuff, 170,135,4);    
+        } else {
+            M5.Lcd.setTextDatum(TC_DATUM);
+            M5.Lcd.drawString("Alarm: OFF", 160,135,4);                 //other wise write Alarm off
+        }
+        
+        M5.Lcd.setTextDatum(TC_DATUM);
+        M5.Lcd.drawString("Click for Snooze or long press for off", 160,175,2);
+    }
+}
+

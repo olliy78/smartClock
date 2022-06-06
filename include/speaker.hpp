@@ -5,12 +5,16 @@
 #include <driver/i2s.h>
 #include "FS.h"
 
+#define CONFIG_I2S_MCK_PIN 0
 #define CONFIG_I2S_BCK_PIN 12
 #define CONFIG_I2S_LRCK_PIN 0
 #define CONFIG_I2S_DATA_PIN 2
-#define CONFIG_I2S_DATA_IN_PIN -1
+#define CONFIG_I2S_DATA_IN_PIN -1       //34
 
 #define SPAKER_I2S_NUMBER I2S_NUM_0
+#define MODE_MIC  0
+#define MODE_SPK  1
+#define DATA_SIZE 1024
 
 typedef struct beepParameters
 {

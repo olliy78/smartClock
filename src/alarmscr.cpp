@@ -34,8 +34,8 @@ void AlarmScreen::setDataModel(DataModel *m){
     model = m;
     _modelisvalid = true;
     alarmval = model->eep.elements.alarmv[model->alscrnr];//get data from model
-    _hh = alarmval.hh;
-    _mm = alarmval.mm;
+    //_hh = alarmval.hh;
+    //_mm = alarmval.mm;
 }
 
 void AlarmScreen::setAlarmClock(AlarmClock *c){
@@ -63,13 +63,14 @@ void AlarmScreen::checkButtons(){
             if (b_day[d]->wasPressed()){
                 changehappend = true;
                 alarmval.day[d] = !alarmval.day[d];
+                updateData();
             }
 
         }
         if (changehappend){
             changehappend = false;
-            _hh = alarmval.hh;
-            _mm = alarmval.mm;
+            //_hh = alarmval.hh;
+            //_mm = alarmval.mm;
             drawScreen(true);
         }
     }
@@ -77,8 +78,8 @@ void AlarmScreen::checkButtons(){
 
 void AlarmScreen::updateData(){
     if (_modelisvalid){
-        alarmval.hh = _hh;
-        alarmval.mm = _mm;
+        //alarmval.hh = _hh;
+        //alarmval.mm = _mm;
         model->eep.elements.alarmv[model->alscrnr] = alarmval;
         model->eepromValid = false; //write data too EEProm next time
     }
@@ -95,45 +96,45 @@ void AlarmScreen::handlePressEvent(int x, int y){
     if (_isactive){
         //check positions of arrows to set the alarm time
         if (x >= xpos && x <= xpos+54 && y >= ypos-25 && y <= ypos+10){
-            _hh = _hh + 10;
+            alarmval.hh = alarmval.hh + 10;
             changehappend = true;
         } 
         if (x >= xpos && x <= xpos+54 && y >= ypos+75 && y <= ypos+100){ 
-            _hh = _hh - 10;
+            alarmval.hh = alarmval.hh - 10;
             changehappend = true;
         }
         if (x >= xpos+55 && x <= xpos+110 && y >= ypos-25 && y <= ypos+10){
-             _hh++;
+             alarmval.hh++;
              changehappend = true;
         }
         if (x >= xpos+55 && x <= xpos+110 && y >= ypos+75 && y <= ypos+100){
-            _hh--;
+            alarmval.hh--;
             changehappend = true;
         }
         if (x >= xpos+120 && x <= xpos+174 && y >= ypos-25 && y <= ypos+10){
-            _mm = _mm + 10;
+            alarmval.mm = alarmval.mm + 10;
             changehappend = true;
         }
         if (x >= xpos+120 && x <= xpos+174 && y >= ypos+75 && y <= ypos+100){
-            _mm = _mm - 10;
+            alarmval.mm = alarmval.mm - 10;
             changehappend = true;
         }
         if (x >= xpos+175 && x <= xpos+229 && y >= ypos-25 && y <= ypos+10){
-            _mm++;
+            alarmval.mm++;
             changehappend = true;
         }
         if (x >= xpos+175 && x <= xpos+229 && y >= ypos+75 && y <= ypos+100){
-            _mm--;
+            alarmval.mm--;
             changehappend = true;
         }
 
         if (changehappend){
             changehappend = false;
             //handling under- and overflow
-            if ( _hh >= 24) _hh = 0;
-            if (_hh < 0) _hh = 23;
-            if (_mm >= 60) _mm = 0;
-            if (_mm < 0) _mm =59;
+            if ( alarmval.hh >= 24) alarmval.hh = 0;
+            if (alarmval.hh < 0) alarmval.hh = 23;
+            if (alarmval.mm >= 60) alarmval.mm = 0;
+            if (alarmval.mm < 0) alarmval.mm =59;
             showClock();
             updateData();
         }
@@ -219,14 +220,14 @@ void AlarmScreen::showClock() {
         M5.Lcd.fillTriangle(xpos+65, ypos-5, xpos+95, ypos-5, xpos + 80, ypos-25, TFT_YELLOW);
         M5.Lcd.fillTriangle(xpos+10, ypos+83, xpos+40, ypos+83, xpos + 25, ypos+103, TFT_YELLOW);
         M5.Lcd.fillTriangle(xpos+65, ypos+83, xpos+95, ypos+83, xpos + 80, ypos+103, TFT_YELLOW);
-        if (_hh < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add hours leading zero for 24 hr clock
-        xpos += M5.Lcd.drawNumber(_hh, xpos, ypos, 8);             // Draw hours
+        if (alarmval.hh < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add hours leading zero for 24 hr clock
+        xpos += M5.Lcd.drawNumber(alarmval.hh, xpos, ypos, 8);             // Draw hours
         xpos += M5.Lcd.drawChar(':', xpos, ypos - 8, 8);
         M5.Lcd.fillTriangle(xpos+10, ypos-5, xpos+40, ypos-5, xpos+25, ypos-25, TFT_YELLOW);
         M5.Lcd.fillTriangle(xpos+65, ypos-5, xpos+95, ypos-5, xpos+80, ypos-25, TFT_YELLOW);
         M5.Lcd.fillTriangle(xpos+10, ypos+83, xpos+40, ypos+83, xpos + 25, ypos+103, TFT_YELLOW);
         M5.Lcd.fillTriangle(xpos+65, ypos+83, xpos+95, ypos+83, xpos + 80, ypos+103, TFT_YELLOW);
-        if (_mm < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
-        xpos += M5.Lcd.drawNumber(_mm, xpos, ypos, 8);             // Draw minutes
+        if (alarmval.mm < 10) xpos += M5.Lcd.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
+        xpos += M5.Lcd.drawNumber(alarmval.mm, xpos, ypos, 8);             // Draw minutes
     }
 }

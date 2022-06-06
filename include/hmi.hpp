@@ -18,11 +18,7 @@ using namespace std;
 
 class Screen {
 
-    
-    
-
     protected:
-
     bool _isactive;
     void checkButtons();
 
@@ -32,8 +28,6 @@ class Screen {
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
     void handlePressEvent(int x, int y);
-
-    
 };
 
 class MainScreen: public Screen {
@@ -41,12 +35,15 @@ class MainScreen: public Screen {
     DataModel *model = nullptr;
     AlarmClock *alarmclk = nullptr;
     bool _modelisvalid = false;
-    Button *alarmbtn;
     uint32_t targetTime;                    // for next 1 second timeout
     bool AlarmState;
+    bool _buttonIsPressed = false;
+    int _buttonIsPressedSince = 0;
+    unsigned long _buttonPressMs = 0;
 
     void showClock(bool redraw);
     void showStatus(bool redraw);
+    void showAlarm(bool redraw);
     void checkButtons();
 
 public:
@@ -59,6 +56,10 @@ public:
     void drawScreen(bool draw);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
     void handlePressEvent(int x, int y);
+    void handlePressingEvent(int x, int y, int duration);
+    void handleReleasingEvent(int x, int y);
+
+
 };
 
 
@@ -68,7 +69,6 @@ class AlarmScreen: public Screen {
     DataModel *model = nullptr;
     AlarmClock *alarmclk = nullptr;
     bool _modelisvalid = false;
-    int _hh, _mm;
     bool _isactive;
     Button *b_day[7];
     Button *b_al1, *b_al2;
@@ -173,6 +173,8 @@ public:
     void wipeScreen(int dir);
     void handleDragEvent(int fromX, int fromY, int toX, int toY);
     void handlePressEvent(int x, int y);
+    void handlePressingEvent(int x, int y, int duration);
+    void handleReleasingEvent(int x, int y);
     void selectScreen(int s);
     
 };

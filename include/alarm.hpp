@@ -18,8 +18,10 @@ class AlarmClock {
     bool _modelisvalid = false;
     bool _initialized = false;
     bool _alarmIsOn = false;
+    long _secToNextAlarm = 0;
 
     void playSound();
+    void calcSecToNextAlarm();
 
 public:
     AlarmClock();
@@ -28,6 +30,12 @@ public:
     void update();
     void setDataModel(DataModel *m);
     void alarmTone(bool b);
+    bool isAlarmSet();
+    bool isAlarmActive();
+    bool isSnooze();
+    long getAlarmInSec();
+    void triggerSnooze();
+    void stopAlarm();
 
 
 };
