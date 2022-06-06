@@ -64,6 +64,9 @@
 #define MIN_SCREEN -2
 #define MAX_SCREEN 2
 #define LONGPRESS 5                 //seconds to press the alarm button to switch the alarm off
+#define SOUNDTIME 1200              //after 20min (1200sec) of alarm sound it is switched off
+#define SNOOZETIME 300              //snooze is 5min
+#define VOLUMEN 10000              //speeker volumen 1000 low 10000 high
 
 
 

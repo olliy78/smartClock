@@ -81,4 +81,5 @@ public:
     void saveEEProm();
     void setRTC(time_t time);
     uint16_t gen_crc16(uint8_t *data, uint16_t size);
+    int calcDayOfWeek (int y, int m, int d);
 };

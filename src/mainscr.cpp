@@ -104,6 +104,7 @@ void MainScreen::drawScreen(bool draw){
 }
 
 void MainScreen::showStatus(bool redraw){
+    M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
     static bool oldstate = true;
     bool newstate = model->wifiOnline && model->mqttOnline;
     if ((oldstate != newstate) || redraw){
@@ -112,7 +113,6 @@ void MainScreen::showStatus(bool redraw){
             redraw = true;
         } else {
             M5.Lcd.setTextDatum(TL_DATUM);
-            M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
             M5.Lcd.drawString("offline!", 265,3,2);
         }
         oldstate = newstate;
@@ -184,11 +184,10 @@ void MainScreen::showClock(bool redraw) {
 }
 
 void MainScreen::showAlarm(bool redraw) {
-    
-    if (alarmclk->isAlarmActive()){
-        static bool red = false;
-        red = !red;
-        if (red){
+    static bool bgRead = true;                 //last time the back ground was read - needed for redaraw th bg Color
+    if (alarmclk->isAlarmActive() || alarmclk->isSnooze()){
+        bgRead = !bgRead;
+        if (bgRead){
             M5.Lcd.fillRect(0, 120, 320, 100, TFT_RED);
             M5.Lcd.setTextColor(TFT_YELLOW, TFT_RED);    
         } else {
@@ -196,31 +195,55 @@ void MainScreen::showAlarm(bool redraw) {
             M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);
         }
     } else {
+        if (bgRead){
+            M5.Lcd.fillRect(0, 120, 320, 100, TFT_BLACK);   //redraw bacground in black
+            bgRead = false;
+        } 
         M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK);
     }
+    M5.Lcd.drawRect(0, 120, 320, 100, TFT_YELLOW);          //draw yellow frame
     
-    M5.Lcd.drawRect(0, 120, 320, 100, TFT_YELLOW);
-    if (_buttonIsPressed){                                              //long press on the button is running
+    if (_buttonIsPressed && (alarmclk->isAlarmActive() || alarmclk->isSnooze())){                                              //long press on the button is running
         int countDown = LONGPRESS - (_buttonIsPressedSince/1000);       //count down until alarm will be deaktivated
-        if (countDown < 0) countDown = 0;
         M5.Lcd.setTextDatum(TC_DATUM);
-        M5.Lcd.drawNumber(countDown, 170,132,8);                        //print the count down
+        if (bgRead) M5.Lcd.setTextColor(TFT_YELLOW, TFT_RED); 
+        else M5.Lcd.setTextColor(TFT_YELLOW, TFT_BLACK); 
+        if (countDown >= 0){
+            M5.Lcd.drawNumber(countDown, 160,132,8);                        //print the count down
+        } else {
+            M5.Lcd.drawString("OFF", 160,135,4);                        //print Alarm OFF
+        }
+        
     } else {
-        if (alarmclk->isAlarmSet()){                                    //is there any alarm set
+        if (alarmclk->isAlarmActive()){
+            M5.Lcd.setTextDatum(TC_DATUM);
+            M5.Lcd.drawString("  !! Alarm !! ", 170,135,4);                 //give the time left
+        } else if (alarmclk->isSnooze()){
             M5.Lcd.setTextDatum(TR_DATUM);
-            M5.Lcd.drawString("Alarm in: ", 170,135,4);                 //give the time left
+            M5.Lcd.drawString("  Snooze: ", 170,135,4);                 //give the time left
+            long secToAlarm = alarmclk->getSnoozeInSec();
+            char timeStrBuff[64] = "";
+            sprintf(timeStrBuff, " %02d:%02d", (int)(secToAlarm%3600)/60, (int)(secToAlarm%60));
+            M5.Lcd.setTextDatum(TL_DATUM);
+            M5.Lcd.drawString(timeStrBuff, 170,135,4);    
+
+        } else if (alarmclk->isAlarmSet()){                                    //is there any alarm set
+            M5.Lcd.setTextDatum(TR_DATUM);
+            M5.Lcd.drawString("   Alarm in: ", 170,135,4);                 //give the time left
             long secToAlarm = alarmclk->getAlarmInSec();
             char timeStrBuff[64] = "";
-            sprintf(timeStrBuff, " %02d:%02d", (int)secToAlarm/3600, (int)(secToAlarm%3600)/60);
+            if (secToAlarm > 60) sprintf(timeStrBuff, " %02d:%02d   ", (int)secToAlarm/3600, (int)(secToAlarm%3600)/60);
+            else sprintf(timeStrBuff, " %02d sec   ", (int)(secToAlarm%60));
             M5.Lcd.setTextDatum(TL_DATUM);
             M5.Lcd.drawString(timeStrBuff, 170,135,4);    
         } else {
             M5.Lcd.setTextDatum(TC_DATUM);
-            M5.Lcd.drawString("Alarm: OFF", 160,135,4);                 //other wise write Alarm off
+            M5.Lcd.drawString("    Alarm: OFF    ", 160,135,4);                 //other wise write Alarm off
         }
-        
-        M5.Lcd.setTextDatum(TC_DATUM);
-        M5.Lcd.drawString("Click for Snooze or long press for off", 160,175,2);
+        if (alarmclk->isAlarmActive() || alarmclk->isSnooze()){         //show the hint only while alarm or snooze
+            M5.Lcd.setTextDatum(TC_DATUM);
+            M5.Lcd.drawString("Click for Snooze or long press for off", 160,175,2);
+        }
     }
 }
 
